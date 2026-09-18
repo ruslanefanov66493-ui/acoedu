@@ -1,0 +1,69 @@
+{{!
+    @template theme_learnhub/theme_boost/navbar
+
+    Students, teachers and admins in cabinet chrome: dark ACO header.
+    Native Moodle /admin/* keeps the Boost navbar.
+}}
+{{#output.learnhub_student_chrome}}
+<nav class="navbar fixed-top navbar-dark lh-navbar d-print-none" aria-label="{{#str}}sitemenubar, admin{{/str}}">
+    <div class="container-fluid lh-navbar__inner">
+        <a href="{{{ output.learnhub_logo_home_url }}}" class="lh-navbar__brand aabtn" aria-label="АЦО — Академия цифрового образования">
+            <img src="{{{ output.learnhub_logo_url }}}" alt="АЦО — Академия цифрового образования">
+        </a>
+
+        <div class="d-flex align-items-stretch usermenu-container lh-navbar__user" data-region="usermenu">
+            {{#usermenu}}
+                {{> core/user_menu }}
+            {{/usermenu}}
+        </div>
+    </div>
+</nav>
+{{/output.learnhub_student_chrome}}
+{{^output.learnhub_student_chrome}}
+<nav class="navbar fixed-top navbar-light bg-white navbar-expand" aria-label="{{#str}}sitemenubar, admin{{/str}}">
+    <div class="container-fluid">
+        <button class="navbar-toggler aabtn d-block d-md-none px-1 my-1 border-0" data-toggler="drawers" data-action="toggle" data-target="theme_boost-drawers-primary">
+            <span class="navbar-toggler-icon"></span>
+            <span class="sr-only">{{#str}}sidepanel, core{{/str}}</span>
+        </button>
+
+        <a href="{{{ config.homeurl }}}" class="navbar-brand d-none d-md-flex align-items-center m-0 me-4 p-0 aabtn">
+            {{# output.should_display_navbar_logo }}
+                <img src="{{output.get_compact_logo_url}}" class="logo me-1" alt="{{sitename}}">
+            {{/ output.should_display_navbar_logo }}
+            {{^ output.should_display_navbar_logo }}
+                {{{ sitename }}}
+            {{/ output.should_display_navbar_logo }}
+        </a>
+        {{#primarymoremenu}}
+            <div class="primary-navigation">
+                {{> core/moremenu}}
+            </div>
+        {{/primarymoremenu}}
+
+        <ul class="navbar-nav d-none d-md-flex my-1 px-1">
+            {{{ output.page_heading_menu }}}
+        </ul>
+
+        <div id="usernavigation" class="navbar-nav ms-auto">
+            {{# output.search_box }}
+                {{{ output.search_box }}}
+                <div class="divider border-start h-75 align-self-center mx-1"></div>
+            {{/output.search_box}}
+            {{#langmenu}}
+                {{> theme_boost/language_menu }}
+                <div class="divider border-start h-75 align-self-center mx-1"></div>
+            {{/langmenu}}
+            {{{ output.navbar_plugin_output }}}
+            <div class="d-flex align-items-stretch usermenu-container" data-region="usermenu">
+                {{#usermenu}}
+                    {{> core/user_menu }}
+                {{/usermenu}}
+            </div>
+            {{{ output.edit_switch }}}
+        </div>
+    </div>
+</nav>
+{{/output.learnhub_student_chrome}}
+
+{{> theme_boost/primary-drawer-mobile }}

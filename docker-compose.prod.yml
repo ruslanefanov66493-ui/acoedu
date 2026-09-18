@@ -1,0 +1,205 @@
+services:
+  mysql:
+    image: mariadb:10.11
+    container_name: aco-mysql
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_USER: ${WORDPRESS_DB_USER}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      MOODLE_DB_NAME: ${MOODLE_DB_NAME}
+      MOODLE_DB_USER: ${MOODLE_DB_USER}
+      MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init-prod:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - aco-network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aco-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${WP_REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - aco-network
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    container_name: aco-wordpress
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG}
+      WP_ENVIRONMENT_TYPE: production
+      ACO_ENABLE_COD_PLACEHOLDER: ${ACO_ENABLE_COD_PLACEHOLDER}
+      WP_REDIS_HOST: redis
+      WP_REDIS_PORT: 6379
+      WP_REDIS_PASSWORD: ${WP_REDIS_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_AUTH: ${SMTP_AUTH}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_SECURE: ${SMTP_SECURE}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+      MAIL_INBOX: ${MAIL_INBOX}
+      MAIL_PARTNERS: ${MAIL_PARTNERS}
+      WORDPRESS_CONFIG_EXTRA: |
+        if (!empty($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+            $$_SERVER['HTTPS'] = 'on';
+        }
+        define('COOKIE_DOMAIN', getenv('COOKIE_DOMAIN') ?: '');
+        define('FORCE_SSL_ADMIN', true);
+        define('DISALLOW_FILE_EDIT', true);
+        define('DISABLE_WP_CRON', true);
+        if (getenv('WP_HOME')) { define('WP_HOME', getenv('WP_HOME')); }
+        if (getenv('WP_SITEURL')) { define('WP_SITEURL', getenv('WP_SITEURL')); }
+        if (getenv('WP_REDIS_HOST')) { define('WP_REDIS_HOST', getenv('WP_REDIS_HOST')); }
+        if (getenv('WP_REDIS_PORT')) { define('WP_REDIS_PORT', (int) getenv('WP_REDIS_PORT')); }
+        if (getenv('WP_REDIS_PASSWORD')) { define('WP_REDIS_PASSWORD', getenv('WP_REDIS_PASSWORD')); }
+        define('WP_REDIS_GRACEFUL', true);
+        if (!defined('ACO_SMTP_HOST') && getenv('SMTP_HOST')) { define('ACO_SMTP_HOST', getenv('SMTP_HOST')); }
+        if (!defined('ACO_SMTP_PORT') && getenv('SMTP_PORT')) { define('ACO_SMTP_PORT', (int) getenv('SMTP_PORT')); }
+        if (!defined('ACO_SMTP_AUTH') && getenv('SMTP_AUTH') !== false && getenv('SMTP_AUTH') !== '') { define('ACO_SMTP_AUTH', filter_var(getenv('SMTP_AUTH'), FILTER_VALIDATE_BOOLEAN)); }
+        if (!defined('ACO_SMTP_USER') && getenv('SMTP_USER') !== false) { define('ACO_SMTP_USER', getenv('SMTP_USER')); }
+        if (!defined('ACO_SMTP_PASS') && getenv('SMTP_PASS') !== false) { define('ACO_SMTP_PASS', getenv('SMTP_PASS')); }
+        if (!defined('ACO_SMTP_SECURE') && getenv('SMTP_SECURE') !== false) { define('ACO_SMTP_SECURE', getenv('SMTP_SECURE')); }
+        if (!defined('ACO_MAIL_FROM') && getenv('MAIL_FROM')) { define('ACO_MAIL_FROM', getenv('MAIL_FROM')); }
+        if (!defined('ACO_MAIL_FROM_NAME') && getenv('MAIL_FROM_NAME')) { define('ACO_MAIL_FROM_NAME', getenv('MAIL_FROM_NAME')); }
+        if (!defined('ACO_MAIL_INBOX') && getenv('MAIL_INBOX')) { define('ACO_MAIL_INBOX', getenv('MAIL_INBOX')); }
+        if (!defined('ACO_MAIL_PARTNERS') && getenv('MAIL_PARTNERS')) { define('ACO_MAIL_PARTNERS', getenv('MAIL_PARTNERS')); }
+    extra_hosts:
+      - "${MOODLE_DOMAIN}:${ACO_PUBLIC_IP}"
+      - "${WP_DOMAIN}:${ACO_PUBLIC_IP}"
+    volumes:
+      - ./wordpress:/var/www/html
+    networks:
+      - aco-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: aco-nginx
+    depends_on:
+      - wordpress
+      - moodle
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # First TLS issue: swap ./nginx/prod → ./nginx/bootstrap and drop :ro on letsencrypt.
+      - ./nginx/prod:/etc/nginx/conf.d
+      - ./wordpress:/var/www/html
+      - ./certs/letsencrypt:/etc/letsencrypt:ro
+      - ./certs/certbot:/var/www/certbot
+    networks:
+      - aco-network
+    restart: unless-stopped
+
+  moodle:
+    image: moodlehq/moodle-php-apache:8.1
+    container_name: aco-moodle
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      MOODLE_DATABASE_HOST: mysql
+      MOODLE_DATABASE_NAME: ${MOODLE_DB_NAME}
+      MOODLE_DATABASE_USER: ${MOODLE_DB_USER}
+      MOODLE_DATABASE_PASSWORD: ${MOODLE_DB_PASSWORD}
+      MOODLE_WWWROOT: ${MOODLE_WWWROOT}
+      MOODLE_SSLPROXY: ${MOODLE_SSLPROXY}
+      MOODLE_REDIS_HOST: redis
+      MOODLE_REDIS_PASSWORD: ${MOODLE_REDIS_PASSWORD}
+      MOODLE_BLOCK_PRIVATE_HOSTS: "1"
+      MOODLE_DATAROOT: /var/www/moodledata
+    extra_hosts:
+      - "${WP_DOMAIN}:${ACO_PUBLIC_IP}"
+      - "${MOODLE_DOMAIN}:${ACO_PUBLIC_IP}"
+    volumes:
+      - ./moodle:/var/www/html
+      - moodle_moodledata:/var/www/moodledata
+    networks:
+      - aco-network
+    restart: unless-stopped
+
+  moodle-cron:
+    image: moodlehq/moodle-php-apache:8.1
+    container_name: aco-moodle-cron
+    depends_on:
+      - moodle
+    env_file: .env
+    environment:
+      MOODLE_DATABASE_HOST: mysql
+      MOODLE_DATABASE_NAME: ${MOODLE_DB_NAME}
+      MOODLE_DATABASE_USER: ${MOODLE_DB_USER}
+      MOODLE_DATABASE_PASSWORD: ${MOODLE_DB_PASSWORD}
+      MOODLE_WWWROOT: ${MOODLE_WWWROOT}
+      MOODLE_SSLPROXY: ${MOODLE_SSLPROXY}
+      MOODLE_REDIS_HOST: redis
+      MOODLE_REDIS_PASSWORD: ${MOODLE_REDIS_PASSWORD}
+      MOODLE_DATAROOT: /var/www/moodledata
+    extra_hosts:
+      - "${WP_DOMAIN}:${ACO_PUBLIC_IP}"
+      - "${MOODLE_DOMAIN}:${ACO_PUBLIC_IP}"
+    volumes:
+      - ./moodle:/var/www/html
+      - moodle_moodledata:/var/www/moodledata
+    networks:
+      - aco-network
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["while true; do php /var/www/html/admin/cli/cron.php; sleep 60; done"]
+
+  wp-cron:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    container_name: aco-wp-cron
+    depends_on:
+      - wordpress
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - ./wordpress:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - aco-network
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["while true; do wp cron event run --due-now --allow-root || true; sleep 300; done"]
+
+volumes:
+  mysql_data:
+  redis_data:
+  moodle_moodledata:
+
+networks:
+  aco-network:
+    driver: bridge

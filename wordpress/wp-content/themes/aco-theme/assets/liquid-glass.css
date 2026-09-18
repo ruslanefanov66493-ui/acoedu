@@ -1,0 +1,409 @@
+/**
+ * Liquid Glass with original ACO brand colors.
+ * Tokens: Primary-600 #4F46E5, Primary-700 #4338CA, cyan #06B6D4.
+ */
+
+body.lh-glass {
+  --lg-blur: 16px;
+  --lg-sat: 1.85;
+  --lg-bg: rgba(255, 255, 255, 0.78);
+  --lg-bg-strong: rgba(255, 255, 255, 0.92);
+  --lg-border: rgba(48, 17, 221, 0.16);
+  --lg-edge: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --lg-shadow: 0 10px 28px rgba(48, 17, 221, 0.12);
+  --lg-shadow-hover: 0 16px 36px rgba(48, 17, 221, 0.2);
+  --lg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --c-btn: #3011dd;
+  --c-primary-600: #4F46E5;
+  --c-primary-700: #4338CA;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+  background:
+    radial-gradient(1000px 520px at 0% -8%, rgba(48, 17, 221, 0.12), transparent 55%),
+    radial-gradient(820px 420px at 100% 0%, rgba(6, 182, 212, 0.12), transparent 50%),
+    #F9FAFB;
+}
+
+body.lh-glass.aco-auth-page {
+  background:
+    linear-gradient(-45deg, #EEF2FF 0%, #ECFEFF 100%),
+    radial-gradient(700px 380px at 85% 20%, rgba(79, 70, 229, 0.18), transparent 60%);
+  background-blend-mode: multiply, normal;
+}
+
+body.lh-glass .lh-dir-card,
+body.lh-glass .lh-course-card,
+body.lh-glass .lh-blog-card,
+body.lh-glass .lh-catalog-filter,
+body.lh-glass .lh-contacts-form,
+body.lh-glass .lh-faq-item,
+body.lh-glass .lh-accordion__item,
+body.lh-glass .lh-course-module,
+body.lh-glass .lh-course-hero__facts li,
+body.lh-glass .lh-stat,
+body.lh-glass .lh-nav-toggle,
+body.lh-glass .aco-auth-card,
+body.lh-glass .woocommerce .aco-checkout #customer_details,
+body.lh-glass .woocommerce .aco-checkout .col2-set .col-1,
+body.lh-glass .woocommerce .aco-checkout #order_review,
+body.lh-glass .aco-checkout-card {
+  background: var(--lg-bg);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  border: 1px solid var(--lg-border);
+  box-shadow: var(--lg-shadow), var(--lg-edge);
+}
+
+body.lh-glass .woocommerce .aco-checkout #customer_details,
+body.lh-glass .woocommerce .aco-checkout .col2-set .col-1,
+body.lh-glass .woocommerce .aco-checkout #order_review {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+}
+
+body.lh-glass .aco-checkout-card--summary {
+  background:
+    linear-gradient(180deg, rgba(238, 242, 255, .72) 0%, rgba(255, 255, 255, .9) 46%);
+}
+
+body.lh-glass .aco-checkout-line {
+  background: rgba(255, 255, 255, .88);
+  border-color: rgba(48, 17, 221, 0.12);
+}
+
+body.lh-glass .aco-checkout-pay,
+body.lh-glass .woocommerce #payment #place_order {
+  background: #3011dd !important;
+  border-color: #3011dd !important;
+  color: #fff !important;
+}
+
+body.lh-glass:not(.page-template-page-account) .lh-header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.lh-glass:not(.page-template-page-account) .lh-header.is-nav-open {
+  background: transparent !important;
+}
+
+body.lh-glass.page-template-page-account .lh-header {
+  background: rgba(255, 255, 255, 0.94) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.2) !important;
+  backdrop-filter: blur(8px) saturate(1.2) !important;
+  border-bottom: 1px solid rgba(48, 17, 221, 0.12) !important;
+}
+
+body.lh-glass:not(.page-template-page-account) .lh-header__inner {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.lh-glass .lh-nav__link {
+  color: #374151;
+  font-weight: 700;
+}
+
+body.lh-glass .lh-nav__link:hover {
+  color: #4338CA;
+}
+
+body.lh-glass .lh-nav__item--active .lh-nav__link,
+body.lh-glass .current-menu-item .lh-nav__link {
+  color: #4338CA;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, .08);
+}
+
+body.lh-glass .lh-nav__indicator {
+  background: #4338CA;
+}
+
+body.lh-glass .lh-btn,
+body.lh-glass .aco-auth-submit {
+  position: relative;
+  overflow: visible;
+  isolation: auto;
+  text-shadow: none !important;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: geometricPrecision;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: none;
+  transition: box-shadow .28s var(--lg-ease), background .28s var(--lg-ease), border-color .28s var(--lg-ease);
+}
+
+body.lh-glass .lh-btn--primary,
+body.lh-glass .lh-btn--buy,
+body.lh-glass .lh-btn--contact,
+body.lh-glass .lh-btn--sm.lh-btn--primary,
+body.lh-glass .aco-auth-submit {
+  background: #3011dd !important;
+  border-color: #3011dd !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(48, 17, 221, 0.28);
+}
+
+body.lh-glass .lh-btn--primary:hover,
+body.lh-glass .lh-btn--buy:hover,
+body.lh-glass .lh-btn--contact:hover,
+body.lh-glass .lh-btn--sm.lh-btn--primary:hover,
+body.lh-glass .aco-auth-submit:hover {
+  background: #270dba !important;
+  border-color: #270dba !important;
+}
+
+body.lh-glass .lh-btn--outline {
+  background: #fff !important;
+  border: 2px solid #3011dd !important;
+  color: #3011dd !important;
+  box-shadow: none;
+}
+
+body.lh-glass .lh-btn--outline:hover {
+  background: #EEF2FF !important;
+  border-color: #3011dd !important;
+  color: #3011dd !important;
+}
+
+body.lh-glass .lh-btn:hover,
+body.lh-glass .aco-auth-submit:hover,
+body.lh-glass .lh-btn:active,
+body.lh-glass .aco-auth-submit:active {
+  transform: none;
+}
+
+body.lh-glass .lh-cta .lh-btn--cta {
+  background: #fff !important;
+  color: #3011dd !important;
+  border: 2px solid #fff !important;
+}
+
+body.lh-glass .lh-cta .lh-btn--cta:hover {
+  background: #EEF2FF !important;
+}
+
+body.lh-glass .lh-dir-card,
+body.lh-glass .lh-course-card,
+body.lh-glass .lh-blog-card,
+body.lh-glass .lh-faq-item,
+body.lh-glass .lh-accordion__item,
+body.lh-glass .lh-course-module,
+body.lh-glass .lh-contacts-form,
+body.lh-glass .aco-auth-card {
+  transition: transform .35s var(--lg-ease), box-shadow .35s var(--lg-ease), background .35s var(--lg-ease), border-color .35s var(--lg-ease);
+}
+
+body.lh-glass .lh-dir-card:hover,
+body.lh-glass .lh-course-card:hover,
+body.lh-glass .lh-blog-card:hover {
+  transform: translateY(-6px);
+  background: var(--lg-bg-strong);
+  box-shadow: var(--lg-shadow-hover), var(--lg-edge);
+  border-color: #4F46E5;
+}
+
+body.lh-glass .lh-dir-card__icon,
+body.lh-glass .lh-stat__num,
+body.lh-glass .lh-hero__title .ts1,
+body.lh-glass .lh-course-card__tag {
+  color: #4338CA !important;
+}
+
+body.lh-glass .lh-catalog-filter {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: #C7D2FE;
+  color: #374151;
+}
+
+body.lh-glass .lh-catalog-filter:hover {
+  background: #EEF2FF;
+  color: #4338CA;
+  border-color: #4F46E5;
+}
+
+body.lh-glass .lh-catalog-filter.is-active {
+  background: #3011dd;
+  border-color: #3011dd;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(48, 17, 221, 0.28);
+}
+
+body.lh-glass .lh-stat {
+  padding: 14px 20px;
+  border-radius: 18px;
+  height: auto;
+}
+
+/* Hero uses a CSS gradient, not the old illustration. */
+body.lh-glass .lh-hero__content {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 30px 20px;
+  text-shadow: none !important;
+}
+
+body.lh-glass .lh-page-hero,
+body.lh-glass .lh-catalog-hero,
+body.lh-glass .lh-course-hero,
+body.lh-glass .lh-checkout-hero {
+  background: linear-gradient(-45deg, #EEF2FF 0%, #ECFEFF 100%);
+}
+
+body.lh-glass .lh-header.is-nav-open .lh-nav__item--active .lh-nav__link,
+body.lh-glass .lh-header.is-nav-open .current-menu-item .lh-nav__link {
+  background: #EEF2FF;
+  box-shadow: none;
+}
+
+body.lh-glass .lh-cta {
+  background: #4338CA;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-top: 0;
+}
+
+body.lh-glass .lh-footer {
+  background: #111827 !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.lh-glass .aco-auth-header {
+  background: #fff;
+  border-bottom: 1px solid #E5E7EB;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.lh-glass .aco-auth-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(79, 70, 229, 0.18);
+}
+
+body.lh-glass .aco-auth-title {
+  color: #111827;
+}
+
+body.lh-glass .aco-auth-switch a,
+body.lh-glass .aco-link,
+body.lh-glass .aco-link-inline,
+body.lh-glass .aco-field a {
+  color: #4338CA;
+}
+
+body.lh-glass .lh-form-group input,
+body.lh-glass .lh-form-group textarea,
+body.lh-glass .lh-form-group select,
+body.lh-glass .lh-contacts-form .lh-form-group input,
+body.lh-glass .lh-contacts-form .lh-form-group textarea,
+body.lh-glass .aco-auth-card input,
+body.lh-glass .aco-field input[type="text"],
+body.lh-glass .aco-field input[type="email"],
+body.lh-glass .aco-field input[type="password"],
+body.lh-glass .woocommerce .aco-checkout form .form-row input.input-text,
+body.lh-glass .woocommerce .aco-checkout form .form-row textarea,
+body.lh-glass .woocommerce .aco-checkout form .form-row select {
+  background: #fff;
+  border: 1.5px solid #C7D2FE;
+}
+
+body.lh-glass .lh-form-group input:focus,
+body.lh-glass .lh-form-group textarea:focus,
+body.lh-glass .lh-contacts-form .lh-form-group input:focus,
+body.lh-glass .lh-contacts-form .lh-form-group textarea:focus,
+body.lh-glass .aco-auth-card input:focus,
+body.lh-glass .aco-field input:focus,
+body.lh-glass .woocommerce .aco-checkout form .form-row input.input-text:focus,
+body.lh-glass .woocommerce .aco-checkout form .form-row textarea:focus,
+body.lh-glass .woocommerce .aco-checkout form .form-row select:focus {
+  background: #fff;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16);
+}
+
+body.lh-glass .lh-course-card__price .ts2 {
+  color: #4F46E5 !important;
+}
+
+body.lh-glass .lg-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s var(--lg-ease), transform .7s var(--lg-ease);
+}
+
+body.lh-glass .lg-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+body.lh-glass .lg-reveal:nth-child(2) { transition-delay: .05s; }
+body.lh-glass .lg-reveal:nth-child(3) { transition-delay: .1s; }
+body.lh-glass .lg-reveal:nth-child(4) { transition-delay: .15s; }
+
+@media (max-width: 1100px) {
+  body.lh-glass .lh-header.is-nav-open .lh-header__panel {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 1px solid #C7D2FE;
+  }
+}
+
+@media (max-width: 768px) {
+  body.lh-glass .lh-hero__content {
+    padding: 12px 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  body.lh-glass .lh-stat {
+    padding: 8px 6px;
+    border-radius: 12px;
+  }
+
+  body.lh-glass:not(.page-template-page-account) .lh-btn,
+  body.lh-glass:not(.page-template-page-account) .lh-btn--contact,
+  body.lh-glass:not(.page-template-page-account) .lh-btn--buy,
+  body.lh-glass:not(.page-template-page-account) .lh-course-card2__btn {
+    width: auto !important;
+    max-width: 100%;
+  }
+
+  body.lh-glass .aco-checkout-pay,
+  body.lh-glass #place_order.aco-checkout-pay {
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.lh-glass *,
+  body.lh-glass *::before,
+  body.lh-glass *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  body.lh-glass .lg-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

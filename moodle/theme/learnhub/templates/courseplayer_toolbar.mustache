@@ -1,0 +1,24 @@
+<nav class="lh-crumb" aria-label="Навигация">Главная <span aria-hidden="true">›</span> Курс <span aria-hidden="true">›</span> Урок</nav>
+{{#hascurrent}}
+<header class="aco-toolbar">
+    <div>
+        <p class="aco-toolbar__idx">{{lesson_index}} · {{lesson_type}}{{#lesson_duration}} · {{lesson_duration}}{{/lesson_duration}}</p>
+        <h1 class="aco-toolbar__title">{{lesson_title}}</h1>
+        <p class="aco-toolbar__st">{{lesson_status}}</p>
+        {{#complete_hint}}
+        <p class="aco-toolbar__hint">{{complete_hint}}</p>
+        {{/complete_hint}}
+    </div>
+    <div class="aco-toolbar__actions">
+        {{#can_complete}}
+        <button type="button" class="aco-btn aco-btn--primary" data-aco-complete="{{cmid}}">Отметить как пройденное</button>
+        {{/can_complete}}
+        {{#is_complete}}
+        <span class="aco-pill aco-pill--done">Пройдено</span>
+        {{/is_complete}}
+        {{#locked_reason}}
+        <span class="aco-pill">{{locked_reason}}</span>
+        {{/locked_reason}}
+    </div>
+</header>
+{{/hascurrent}}

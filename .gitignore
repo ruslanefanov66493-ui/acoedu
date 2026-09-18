@@ -1,0 +1,17 @@
+.DS_Store
+.idea/
+.vscode/
+*.log
+.env
+.env.*
+!.env.example
+
+wordpress/wp-config.php
+moodle/config.php
+certs/
+backups/
+moodledata/
+wordpress/wp-content/cache/
+wordpress/wp-content/uploads/
+**/node_modules/
+Thumbs.db

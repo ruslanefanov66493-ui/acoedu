@@ -1,0 +1,13 @@
+{{!
+    @template theme_learnhub/core/user_menu_metadata
+
+    Avatar + full name, matching the ACO header mockup.
+}}
+<span class="avatars">
+    {{#avatardata}}
+        <span class="avatar {{classes}}">
+            {{{content}}}
+        </span>
+    {{/avatardata}}
+</span>
+<span class="usertext">{{userfullname}}</span>

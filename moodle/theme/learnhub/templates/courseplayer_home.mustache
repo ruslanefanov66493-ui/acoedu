@@ -1,0 +1,42 @@
+<nav class="lh-crumb" aria-label="Навигация">Главная <span aria-hidden="true">›</span> Курс</nav>
+<div class="aco-home">
+    {{#hascover}}
+    <div class="aco-home__cover" style="background-image: url('{{cover}}')"></div>
+    {{/hascover}}
+    <p class="aco-home__kicker">Учебный курс</p>
+    <h1 class="aco-home__title">{{coursename}}</h1>
+    {{#hasfinal}}<p class="aco-home__badge">В программе есть финальная работа</p>{{/hasfinal}}
+    {{#haslead}}<div class="aco-home__lead">{{{coursesummary}}}</div>{{/haslead}}
+
+    <div class="aco-home__stats">
+        <div><span>Видео</span><strong>{{video_done}} / {{video_total}}</strong></div>
+        <div><span>Практика</span><strong>{{practice_done}} / {{practice_total}}</strong></div>
+        <div><span>Тесты</span><strong>{{test_done}} / {{test_total}}</strong></div>
+        <div><span>Прогресс</span><strong>{{percent}}%</strong></div>
+    </div>
+    <div class="aco-progress aco-progress--wide">
+        <div class="aco-progress__bar"><span style="width: {{percent}}%"></span></div>
+        <p class="aco-progress__status aco-progress__status--{{statusclass}}">{{status}}</p>
+    </div>
+
+    <div class="aco-home__ctas">
+        <a class="aco-home__cta" href="{{continueurl}}">{{continuelabel}}</a>
+        <a class="aco-home__cta aco-home__cta--ghost" href="{{curatorurl}}">Связь с куратором</a>
+    </div>
+
+    {{#hasfinalwork}}
+    {{#finalwork}}
+    <section class="aco-final-banner {{#locked}}is-locked{{/locked}}">
+        <p class="aco-final-banner__kicker">Финальная работа</p>
+        <h2>{{blocktitle}}</h2>
+        <p>{{blurb}}</p>
+        {{#locked}}
+        <button type="button" class="aco-home__cta aco-home__cta--ghost" disabled>{{openlabel}}</button>
+        {{/locked}}
+        {{^locked}}
+        <a class="aco-home__cta aco-home__cta--ghost" href="{{url}}">{{openlabel}}</a>
+        {{/locked}}
+    </section>
+    {{/finalwork}}
+    {{/hasfinalwork}}
+</div>

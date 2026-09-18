@@ -1,0 +1,173 @@
+services:
+  mysql:
+    image: mariadb:10.11
+    container_name: aco-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      # Создаем обе базы данных
+      MYSQL_DATABASE: db_wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d 
+    ports:
+      - "3306:3306"
+    networks:
+      - aco-network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aco-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - aco-network
+    command: redis-server --appendonly yes
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: aco-mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # Web UI — http://localhost:8025
+      - "1025:1025"   # SMTP
+    networks:
+      - aco-network
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    container_name: aco-wordpress
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: db_wordpress
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DEBUG: 1
+      WP_ENVIRONMENT_TYPE: local
+      ACO_ENABLE_COD_PLACEHOLDER: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('COOKIE_DOMAIN', '.localtest.me');
+        define('FORCE_SSL_ADMIN', false);
+        define('WP_HOME', 'http://wp.localtest.me');
+        define('WP_SITEURL', 'http://wp.localtest.me');
+        if (!defined('ACO_SMTP_HOST') && getenv('SMTP_HOST')) { define('ACO_SMTP_HOST', getenv('SMTP_HOST')); }
+        if (!defined('ACO_SMTP_PORT') && getenv('SMTP_PORT')) { define('ACO_SMTP_PORT', (int) getenv('SMTP_PORT')); }
+        if (!defined('ACO_SMTP_AUTH') && getenv('SMTP_AUTH') !== false && getenv('SMTP_AUTH') !== '') { define('ACO_SMTP_AUTH', filter_var(getenv('SMTP_AUTH'), FILTER_VALIDATE_BOOLEAN)); }
+        if (!defined('ACO_SMTP_USER') && getenv('SMTP_USER') !== false) { define('ACO_SMTP_USER', getenv('SMTP_USER')); }
+        if (!defined('ACO_SMTP_PASS') && getenv('SMTP_PASS') !== false) { define('ACO_SMTP_PASS', getenv('SMTP_PASS')); }
+        if (!defined('ACO_SMTP_SECURE') && getenv('SMTP_SECURE') !== false) { define('ACO_SMTP_SECURE', getenv('SMTP_SECURE')); }
+        if (!defined('ACO_MAIL_FROM') && getenv('MAIL_FROM')) { define('ACO_MAIL_FROM', getenv('MAIL_FROM')); }
+        if (!defined('ACO_MAIL_FROM_NAME') && getenv('MAIL_FROM_NAME')) { define('ACO_MAIL_FROM_NAME', getenv('MAIL_FROM_NAME')); }
+        if (!defined('ACO_MAIL_INBOX') && getenv('MAIL_INBOX')) { define('ACO_MAIL_INBOX', getenv('MAIL_INBOX')); }
+        if (!defined('ACO_MAIL_PARTNERS') && getenv('MAIL_PARTNERS')) { define('ACO_MAIL_PARTNERS', getenv('MAIL_PARTNERS')); }
+      # SMTP: Mailpit locally, or Unisender Go when SMTP_* are set in .env
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_AUTH: ${SMTP_AUTH:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@aco-education.ru}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-АЦО — Академия цифрового образования}
+      MAIL_INBOX: ${MAIL_INBOX:-}
+      MAIL_PARTNERS: ${MAIL_PARTNERS:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "moodle.localtest.me:host-gateway"
+    volumes:
+      - ./wordpress:/var/www/html
+    networks:
+      - aco-network
+    restart: unless-stopped
+
+  wpcli:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    container_name: aco-wpcli
+    depends_on:
+      mysql:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: db_wordpress
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - ./wordpress:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - aco-network
+    entrypoint: ["wp"]
+
+  nginx:
+    image: nginx:alpine
+    container_name: aco-nginx
+    depends_on:
+      - wordpress
+      - moodle
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./wordpress:/var/www/html
+    networks:
+      - aco-network
+    restart: unless-stopped
+
+  moodle:
+    image: moodlehq/moodle-php-apache:8.1
+    container_name: aco-moodle
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MOODLE_DATABASE_HOST: mysql
+      MOODLE_DATABASE_NAME: db_moodle
+      MOODLE_DATABASE_USER: moodle_user
+      MOODLE_DATABASE_PASSWORD: moodle_pass
+      MOODLE_WWWROOT: http://moodle.localtest.me:8081
+      MOODLE_COOKIE_DOMAIN: .localtest.me
+      MOODLE_SESSION_COOKIE_PATH: /
+      MOODLE_USERNAME: admin
+      MOODLE_PASSWORD: ${MOODLE_PASSWORD:-changeme}
+      MOODLE_SITE_NAME: "АЦО Moodle"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "wp.localtest.me:host-gateway"
+    ports:
+      - "8081:80"
+    networks:
+      - aco-network
+    volumes:
+      - ./moodle:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  moodle_data:
+  moodle_moodledata:
+
+networks:
+  aco-network:
+    driver: bridge

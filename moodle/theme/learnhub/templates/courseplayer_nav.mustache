@@ -1,0 +1,126 @@
+<div class="aco-nav">
+    <div class="aco-nav__sheet-bar">
+        <span class="aco-nav__handle" aria-hidden="true"></span>
+        <div class="aco-nav__sheet-top">
+            <div>
+                <p class="aco-nav__kicker">Программа курса</p>
+                <h2 class="aco-nav__title">{{coursename}}</h2>
+            </div>
+            <button type="button" class="aco-nav__close" data-aco-toggle aria-label="Закрыть программу">×</button>
+        </div>
+        <div class="aco-progress">
+            <div class="aco-progress__row">
+                <span>Общий прогресс</span>
+                <strong>{{percent}}%</strong>
+            </div>
+            <div class="aco-progress__bar" role="progressbar" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100">
+                <span style="width: {{percent}}%"></span>
+            </div>
+            <p class="aco-progress__status aco-progress__status--{{statusclass}}">{{status}}</p>
+        </div>
+        <ul class="aco-counters">
+            <li><span>Видео</span><strong>{{video_done}}/{{video_total}}</strong></li>
+            <li><span>Практика</span><strong>{{practice_done}}/{{practice_total}}</strong></li>
+            <li><span>Тесты</span><strong>{{test_done}}/{{test_total}}</strong></li>
+        </ul>
+    </div>
+
+    <ol class="aco-mods">
+        {{#modules}}
+        <li class="aco-mod aco-mod--{{status}} {{#expanded}}is-open{{/expanded}} {{#locked}}is-locked{{/locked}} {{#hascurrent}}has-current{{/hascurrent}}">
+            <button type="button" class="aco-mod__toggle" data-aco-acc aria-expanded="{{#expanded}}true{{/expanded}}{{^expanded}}false{{/expanded}}">
+                <span class="aco-mod__num">{{number}}</span>
+                <span class="aco-mod__meta">
+                    <span class="aco-mod__name">{{name}}</span>
+                    {{#hassummary}}<span class="aco-mod__sum">{{summary}}</span>{{/hassummary}}
+                    <span class="aco-mod__st">{{statuslabel}}{{#hascount}} · {{countlabel}}{{/hascount}}</span>
+                    {{#hascount}}
+                    <span class="aco-mod__bar" aria-hidden="true"><span style="width: {{modpct}}%"></span></span>
+                    {{/hascount}}
+                </span>
+                <span class="aco-mod__chev" aria-hidden="true"></span>
+            </button>
+            <ul class="aco-lessons">
+                {{#lessons}}
+                <li class="aco-lesson aco-lesson--{{type}} {{#current}}is-current{{/current}} {{#complete}}is-done{{/complete}} {{#locked}}is-locked{{/locked}}">
+                    {{#locked}}
+                    <span class="aco-lesson__row" title="{{lockreason}}">
+                        <span class="aco-lesson__ico" aria-hidden="true"></span>
+                        <span class="aco-lesson__txt">
+                            <span class="aco-lesson__idx">{{index}}</span>
+                            <span class="aco-lesson__name">{{name}}</span>
+                            <span class="aco-lesson__sub">{{typelabel}}{{#hasduration}} · {{duration}}{{/hasduration}}</span>
+                            <span class="aco-lesson__lock">{{lockreason}}</span>
+                        </span>
+                        <span class="aco-lesson__mark aco-lesson__mark--lock" aria-label="Заблокирован"></span>
+                    </span>
+                    {{/locked}}
+                    {{^locked}}
+                    <a class="aco-lesson__row" href="{{url}}">
+                        <span class="aco-lesson__ico" aria-hidden="true"></span>
+                        <span class="aco-lesson__txt">
+                            <span class="aco-lesson__idx">{{index}}</span>
+                            <span class="aco-lesson__name">{{name}}</span>
+                            <span class="aco-lesson__sub">{{typelabel}}{{#hasduration}} · {{duration}}{{/hasduration}}</span>
+                        </span>
+                        {{#complete}}<span class="aco-lesson__mark aco-lesson__mark--done" aria-label="Завершено"></span>{{/complete}}
+                        {{^complete}}<span class="aco-lesson__mark aco-lesson__mark--todo" aria-label="Не пройден"></span>{{/complete}}
+                    </a>
+                    {{/locked}}
+                </li>
+                {{/lessons}}
+            </ul>
+        </li>
+        {{/modules}}
+    </ol>
+
+    {{#hasfinaltest}}
+    {{#finaltest}}
+    <div class="aco-special aco-special--test {{#locked}}is-locked{{/locked}} {{#complete}}is-done{{/complete}} {{#current}}is-current{{/current}}">
+        {{#locked}}
+        <span class="aco-special__row">
+            <strong>{{blocktitle}}</strong>
+            <span>{{blurb}}</span>
+        </span>
+        {{/locked}}
+        {{^locked}}
+        <a class="aco-special__row" href="{{url}}">
+            <strong>{{blocktitle}}</strong>
+            <span>{{blurb}}</span>
+            <em>{{openlabel}}</em>
+        </a>
+        {{/locked}}
+    </div>
+    {{/finaltest}}
+    {{/hasfinaltest}}
+
+    {{#hasfinalwork}}
+    {{#finalwork}}
+    <div class="aco-special aco-special--final {{#locked}}is-locked{{/locked}} {{#complete}}is-done{{/complete}} {{#current}}is-current{{/current}}">
+        {{#locked}}
+        <span class="aco-special__row">
+            <strong>{{blocktitle}}</strong>
+            <span>{{blurb}}</span>
+        </span>
+        {{/locked}}
+        {{^locked}}
+        <a class="aco-special__row" href="{{url}}">
+            <strong>{{blocktitle}}</strong>
+            <span>{{blurb}}</span>
+            <em>{{openlabel}}</em>
+        </a>
+        {{/locked}}
+    </div>
+    {{/finalwork}}
+    {{/hasfinalwork}}
+
+    <a class="aco-cert aco-curator {{#curator_unread}}is-unread{{/curator_unread}} {{#curator_current}}is-current{{/curator_current}}" href="{{curatorurl}}">
+        <strong>{{curatorlabel}}</strong>
+        <span>{{curator_hint}}</span>
+    </a>
+
+    <a class="aco-cert {{#certificate_ready}}is-ready{{/certificate_ready}}" href="{{certificateurl}}">
+        <strong>Сертификат</strong>
+        <span>{{certificate_hint}}</span>
+    </a>
+</div>

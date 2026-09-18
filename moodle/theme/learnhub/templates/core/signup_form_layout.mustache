@@ -1,0 +1,12 @@
+{{!
+    @template theme_learnhub/core/signup_form_layout
+}}
+<div class="signupform lh-login">
+    <div class="lh-login__brand">
+        {{#logourl}}
+            <img src="{{logourl}}" class="lh-login__logo" alt="{{sitename}}">
+        {{/logourl}}
+        <h1 class="login-heading lh-login__title">{{#str}} newaccount {{/str}}</h1>
+    </div>
+    {{{formhtml}}}
+</div>

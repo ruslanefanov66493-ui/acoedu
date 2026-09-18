@@ -1,0 +1,369 @@
+/* ACO custom admin panel — desktop-first */
+.lh-studio {
+  padding: 28px 0 72px;
+  background: #F8FAFC;
+}
+
+.lh-studio__container {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.lh-studio__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.lh-studio__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4F46E5;
+}
+
+.lh-studio__title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.15;
+  color: #111827;
+}
+
+.lh-studio__lead {
+  margin: 0;
+  max-width: 560px;
+  color: #6B7280;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.lh-studio__head-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lh-studio__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.lh-studio__tab {
+  border: 1px solid #E5E7EB;
+  background: #fff;
+  color: #374151;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lh-studio__tab.is-active {
+  background: #4F46E5;
+  border-color: #4F46E5;
+  color: #fff;
+}
+
+.lh-studio-toast {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #EEF2FF;
+  color: #312E81;
+  font-size: 14px;
+}
+
+.lh-studio-toast.is-error {
+  background: #FEF2F2;
+  color: #991B1B;
+}
+
+.lh-studio-screen {
+  display: none;
+}
+
+.lh-studio-screen.is-active {
+  display: block;
+}
+
+.lh-studio-screen__title,
+.lh-studio-card__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.3;
+  color: #111827;
+}
+
+.lh-studio-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.lh-studio-muted {
+  color: #6B7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.lh-studio-grid--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.lh-studio-card {
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.lh-studio-table-wrap {
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 16px;
+}
+
+.lh-studio-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lh-studio-table th,
+.lh-studio-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: middle;
+}
+
+.lh-studio-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  background: #F9FAFB;
+}
+
+.lh-studio-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.lh-studio-table__slug {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6B7280;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.lh-studio-table__actions {
+  white-space: nowrap;
+  min-width: 196px;
+}
+
+.lh-studio-thumb {
+  width: 64px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #EEF2FF;
+  display: block;
+}
+
+.lh-studio-thumb--empty {
+  display: grid;
+  place-items: center;
+  color: #4F46E5;
+  font-size: 18px;
+}
+
+.lh-studio-link {
+  border: 0;
+  background: none;
+  color: #4F46E5;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.lh-studio-inline-form {
+  display: inline;
+  margin-left: 8px;
+}
+
+.lh-studio-inline-form .lh-studio-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+}
+
+.lh-studio-link--danger {
+  color: #DC2626;
+}
+
+.lh-studio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lh-studio-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.lh-studio-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6B7280;
+  line-height: 1.4;
+}
+
+.lh-studio-field input,
+.lh-studio-field textarea,
+.lh-studio-field select {
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 400;
+  color: #111827;
+  background: #fff;
+}
+
+.lh-studio-field input[type="checkbox"] {
+  width: auto;
+}
+
+.lh-studio-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+  color: #111827;
+}
+
+.lh-studio-field [data-moodle-builder] {
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.lh-studio-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.lh-studio-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.lh-studio-editor__main,
+.lh-studio-editor__side {
+  display: grid;
+  gap: 16px;
+}
+
+.lh-studio-repeater {
+  display: grid;
+  gap: 12px;
+}
+
+.lh-studio-row {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed #E5E7EB;
+  border-radius: 12px;
+  background: #F9FAFB;
+}
+
+.lh-studio-row__remove {
+  justify-self: start;
+  border: 0;
+  background: none;
+  color: #DC2626;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.lh-studio-media {
+  min-height: 88px;
+  border-radius: 12px;
+  background: #F3F4F6;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: #9CA3AF;
+  font-size: 13px;
+}
+
+.lh-studio-media img,
+.lh-studio-media video {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.lh-studio-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #F3F4F6;
+  color: #4B5563;
+}
+
+.lh-studio-pill.is-on {
+  background: #EEF2FF;
+  color: #4F46E5;
+}
+
+.lh-studio .lh-btn {
+  width: auto;
+}
+
+@media (max-width: 900px) {
+  .lh-studio-grid--split,
+  .lh-studio-editor {
+    grid-template-columns: 1fr;
+  }
+}

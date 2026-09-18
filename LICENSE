@@ -1,0 +1,9 @@
+Copyright (c) 2026 АЦО — Академия цифрового образования
+
+This original code (themes, course format, mu-plugins, Docker and Nginx
+configs) is licensed under the GNU General Public License v3.0 or later.
+
+WordPress, Moodle, WooCommerce and third-party plugins remain under their
+own licenses (typically GPL). They are not vendored in this repository.
+
+Full license text: https://www.gnu.org/licenses/gpl-3.0.html

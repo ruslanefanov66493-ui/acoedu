@@ -1,0 +1,19 @@
+<nav class="aco-pager" aria-label="Навигация по урокам">
+    {{#hasprev}}
+    <a class="aco-pager__btn" href="{{prevurl}}"><span class="aco-pager__full">← Предыдущий урок</span><span class="aco-pager__short">Назад</span></a>
+    {{/hasprev}}
+    {{^hasprev}}
+    <span class="aco-pager__btn is-disabled"><span class="aco-pager__full">← Предыдущий урок</span><span class="aco-pager__short">Назад</span></span>
+    {{/hasprev}}
+    {{#hasnext}}
+        {{#nextlocked}}
+        <span class="aco-pager__btn is-disabled" title="{{nextlockreason}}"><span class="aco-pager__full">Следующий урок →</span><span class="aco-pager__short">Далее</span></span>
+        {{/nextlocked}}
+        {{^nextlocked}}
+        <a class="aco-pager__btn aco-pager__btn--next" href="{{nexturl}}"><span class="aco-pager__full">Следующий урок →</span><span class="aco-pager__short">Далее</span></a>
+        {{/nextlocked}}
+    {{/hasnext}}
+    {{^hasnext}}
+    <span class="aco-pager__btn is-disabled"><span class="aco-pager__full">Следующий урок →</span><span class="aco-pager__short">Далее</span></span>
+    {{/hasnext}}
+</nav>
