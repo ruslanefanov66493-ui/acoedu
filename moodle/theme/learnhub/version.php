@@ -7,7 +7,7 @@
 
 defined( 'MOODLE_INTERNAL' ) || die();
 
-$plugin->version   = 2026101105;
+$plugin->version   = 2026101106;
 $plugin->requires  = 2022041900; // Moodle 4.0+
 $plugin->component = 'theme_learnhub';
 $plugin->maturity  = MATURITY_STABLE;
