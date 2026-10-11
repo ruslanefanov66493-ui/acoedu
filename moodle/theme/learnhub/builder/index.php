@@ -326,8 +326,17 @@ $courses = get_courses('all', 'c.fullname ASC', 'c.id, c.fullname, c.shortname, 
 echo $OUTPUT->header();
 echo theme_learnhub_builder_header_html(null);
 echo html_writer::start_div('lh-build lh-build--list');
+echo html_writer::start_div('lh-build__pagehead');
+echo html_writer::start_div('lh-build__pagehead-text');
 echo html_writer::tag('h1', 'Конструктор курсов');
 echo html_writer::tag('p', 'Соберите программу: модули, видео Kinescope, тесты и домашки. Публичная витрина живёт в панели WordPress.', ['class' => 'lh-build__hint']);
+echo html_writer::end_div();
+echo html_writer::link(
+    new moodle_url('/theme/learnhub/staff/meeting.php'),
+    'Конференция с преподавателями',
+    ['class' => 'lh-build__btn']
+);
+echo html_writer::end_div();
 
 echo html_writer::start_tag('form', [
     'method' => 'post',

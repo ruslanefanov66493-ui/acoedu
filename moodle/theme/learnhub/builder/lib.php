@@ -1007,33 +1007,32 @@ function theme_learnhub_builder_file_presets() {
  * @return string
  */
 function theme_learnhub_builder_header_html($course = null) {
-    global $CFG, $USER;
+    global $PAGE, $USER;
 
-    $wp = rtrim((string) get_config('auth_edwiserbridge', 'wpsiteurl'), '/');
-    $home = $wp !== '' ? $wp . '/' : $CFG->wwwroot . '/my/';
     $list = new moodle_url('/theme/learnhub/builder/index.php');
+    $teachers = new moodle_url('/theme/learnhub/builder/teachers.php');
     $logout = new moodle_url('/login/logout.php', ['sesskey' => sesskey()]);
+    $path = $PAGE->url ? (string) $PAGE->url->get_path() : '';
+    $onteachers = strpos($path, '/theme/learnhub/builder/teachers.php') !== false;
 
-    $links = html_writer::link($list, 'Все курсы');
-    $links .= html_writer::link($home, 'Сайт АЦО');
-    if ($course) {
-        $links .= html_writer::link(
-            new moodle_url('/course/view.php', ['id' => $course->id, 'lhpreview' => 1]),
-            'Как видит студент',
-            ['target' => '_blank']
-        );
-        $links .= html_writer::link(new moodle_url('/user/index.php', ['id' => $course->id]), 'Участники');
-        $links .= html_writer::link(new moodle_url('/grade/report/grader/index.php', ['id' => $course->id]), 'Оценки');
-        $links .= html_writer::link(new moodle_url('/course/edit.php', ['id' => $course->id]), 'Настройки Moodle');
-    }
+    $links = html_writer::link($list, 'Конструктор', ['class' => $onteachers ? '' : 'is-active']);
+    $links .= html_writer::link($teachers, 'Преподаватели', ['class' => $onteachers ? 'is-active' : '']);
     $links .= html_writer::link(new moodle_url('/admin/search.php'), 'Админка Moodle');
+
+    if ($onteachers) {
+        $title = 'Преподаватели';
+    } else if ($course) {
+        $title = format_string($course->fullname);
+    } else {
+        $title = 'Конструктор курсов';
+    }
 
     $user = html_writer::span(s(fullname($USER)), 'lh-build__user');
     $user .= html_writer::link($logout, 'Выход');
 
     $html = html_writer::start_tag('header', ['class' => 'lh-build__top']);
-    $html .= html_writer::link($home, 'АЦО', ['class' => 'lh-build__logo']);
-    $html .= html_writer::tag('strong', $course ? format_string($course->fullname) : 'Конструктор курсов', ['class' => 'lh-build__title']);
+    $html .= html_writer::link($list, 'АЦО', ['class' => 'lh-build__logo']);
+    $html .= html_writer::tag('strong', $title, ['class' => 'lh-build__title']);
     $html .= html_writer::div($links, 'lh-build__nav');
     $html .= html_writer::div($user, 'lh-build__right');
     $html .= html_writer::end_tag('header');

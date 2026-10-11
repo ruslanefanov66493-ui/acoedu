@@ -426,63 +426,24 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return array
      */
     private function learnhub_admin_nav_items() {
-        global $PAGE, $CFG, $USER, $DB;
+        global $PAGE, $CFG;
 
         $path = (string) parse_url($PAGE->url->out(false), PHP_URL_PATH);
-        $courseid = 0;
-        if (!empty($PAGE->course) && (int) $PAGE->course->id !== (int) SITEID) {
-            $courseid = (int) $PAGE->course->id;
-        }
-        if (!$courseid) {
-            $courseid = optional_param('id', 0, PARAM_INT);
-        }
-        if ($courseid) {
-            $short = $DB->get_field('course', 'shortname', ['id' => $courseid]);
-            if ($short === \theme_learnhub\meetings::STAFF_COURSE) {
-                $courseid = 0;
-            }
-        }
 
         $builder = $CFG->wwwroot . '/theme/learnhub/builder/index.php';
+        $teachers = $CFG->wwwroot . '/theme/learnhub/builder/teachers.php';
         $onbuilder = strpos($path, '/theme/learnhub/builder/') !== false;
-        $onusers = strpos($path, '/user/index.php') !== false;
-        $ongrades = strpos($path, '/grade/') !== false;
+        $onteachers = strpos($path, '/theme/learnhub/builder/teachers.php') !== false;
         $onpreview = !empty(optional_param('lhpreview', 0, PARAM_BOOL));
-
-        $usersurl = $courseid
-            ? $CFG->wwwroot . '/user/index.php?id=' . $courseid
-            : $builder;
-        $gradesurl = $courseid
-            ? $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $courseid
-            : $builder;
 
         $onmeetings = strpos($path, '/theme/learnhub/staff/meeting') !== false;
         if (!$onmeetings && !empty($PAGE->cm) && $PAGE->cm->modname === 'bigbluebuttonbn') {
             $onmeetings = (string) $PAGE->cm->idnumber === \theme_learnhub\meetings::STAFF;
         }
-        $meetcount = \theme_learnhub\meetings::staff_upcoming_count((int) $USER->id, false);
-        $meetlabel = $meetcount ? 'Встречи (' . $meetcount . ')' : 'Встречи';
 
         return [
-            ['label' => 'Курсы', 'url' => $builder, 'active' => $onbuilder && !$onpreview && !$onmeetings, 'disabled' => false],
-            [
-                'label' => 'Участники',
-                'url' => $usersurl,
-                'active' => $onusers,
-                'disabled' => !$courseid,
-            ],
-            [
-                'label' => 'Оценки',
-                'url' => $gradesurl,
-                'active' => $ongrades,
-                'disabled' => !$courseid,
-            ],
-            [
-                'label' => $meetlabel,
-                'url' => $CFG->wwwroot . '/theme/learnhub/staff/meetings.php',
-                'active' => $onmeetings,
-                'disabled' => false,
-            ],
+            ['label' => 'Конструктор', 'url' => $builder, 'active' => $onbuilder && !$onteachers && !$onpreview, 'disabled' => false],
+            ['label' => 'Преподаватели', 'url' => $teachers, 'active' => $onteachers || $onmeetings, 'disabled' => false],
             [
                 'label' => 'Moodle',
                 'url' => $CFG->wwwroot . '/admin/search.php',
