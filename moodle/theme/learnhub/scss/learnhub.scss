@@ -1796,7 +1796,7 @@ body.aco-nav-lock {
 }
 
 .aco-player__main {
-  padding: 28px 36px 48px;
+  padding: 28px 36px 36px;
   max-width: 920px;
 }
 
@@ -2320,7 +2320,9 @@ body.lh-student.lh-player .aco-player__moodle {
 }
 
 .aco-video {
-  margin-bottom: 16px;
+  margin-bottom: 0;
+
+  > p { margin: 0 0 16px; }
 }
 .aco-video__stage {
   aspect-ratio: 16/9;
@@ -2468,14 +2470,23 @@ body.lh-student.lh-player {
 }
 .aco-note, .aco-example {
   border-radius: $lh-r-md;
-  padding: 12px 16px;
-  margin: 16px 0;
+  padding: 16px 18px;
+  margin: 12px 0 0;
 }
 .aco-note { background: #FFF7ED; border-left: 4px solid #F59E0B; }
 .aco-example { background: $lh-p50; border-left: 4px solid $lh-p600; }
+.aco-note ul,
+.aco-example ul,
+.aco-note ol,
+.aco-example ol {
+  margin: 8px 0 0;
+  padding-left: 1.15em;
+}
+.aco-note li + li,
+.aco-example li + li { margin-top: 4px; }
 
 .lh-player-foot {
-  margin-top: 28px;
+  margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid $lh-border;
   color: $lh-ph;
@@ -2497,7 +2508,7 @@ body.lh-student.lh-player {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 .aco-pager__btn {
   padding: 10px 16px;
@@ -2521,8 +2532,9 @@ body.lh-student.lh-player {
     .lh-crumb { display: none; }
     .lh-app-footer { display: none; }
     #page.drawers .main-inner,
+    #topofscroll.main-inner,
     .main-inner {
-      padding-bottom: 28px !important;
+      padding: 16px 16px 20px !important;
     }
   }
 
@@ -2530,7 +2542,8 @@ body.lh-student.lh-player {
     display: block;
     position: relative;
     overflow: visible;
-    padding-bottom: 88px;
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+    border-radius: 16px;
   }
 
   .aco-player__scrim {
@@ -2550,8 +2563,8 @@ body.lh-student.lh-player {
     align-items: center;
     gap: 12px;
     position: fixed;
-    left: 12px;
-    right: 12px;
+    left: 16px;
+    right: 16px;
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     z-index: 30;
     margin: 0;
@@ -2676,7 +2689,8 @@ body.lh-student.lh-player {
     padding-right: 2px;
   }
 
-  .aco-player__main { padding: 16px 16px 8px; }
+  .aco-player__main { padding: 16px 16px 12px; }
+  .lh-player-foot { margin-top: 20px; }
   .aco-home__stats { grid-template-columns: 1fr 1fr; }
   .aco-toolbar { flex-direction: column; gap: 10px; margin-bottom: 14px; }
   .aco-toolbar__title { font-size: 1.25rem; }
@@ -2691,35 +2705,34 @@ body.lh-student.lh-player {
   .aco-player__moodle { padding: 14px; }
 
   .aco-player--video {
-    border-left: 0;
-    border-right: 0;
-    border-radius: $lh-r-lg $lh-r-lg 0 0;
-
-    .aco-player__main {
+    .aco-toolbar,
+    .aco-pager,
+    .lh-player-foot {
       padding-left: 0;
       padding-right: 0;
     }
-    .aco-toolbar,
-    .aco-pager {
-      padding-left: 16px;
-      padding-right: 16px;
-    }
-    .box.generalbox {
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-    }
     .kinescope-embed,
-    .aco-video-embed {
-      border-radius: 0;
-    }
-    .aco-lesson-notes {
-      margin: 12px 16px 0;
-      padding: 14px 16px;
-      background: $lh-white;
-      border: 1px solid $lh-border;
+    .aco-video-embed,
+    .aco-video__stage {
       border-radius: 16px;
     }
+    .aco-lesson-notes {
+      margin: 16px 0 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+  }
+
+  body.lh-player .aco-player--video .aco-player__moodle,
+  body.lh-player .aco-player--video .aco-player__moodle .box.generalbox {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .aco-player--test,
@@ -2757,6 +2770,23 @@ body.lh-student.lh-player {
     overflow-x: auto;
     table { display: block; overflow-x: auto; max-width: 100%; }
   }
+
+  body.lh-student.lh-player {
+    #page.drawers .main-inner,
+    #topofscroll.main-inner,
+    .main-inner {
+      padding: 12px !important;
+    }
+  }
+
+  .aco-player__menu-btn {
+    left: 12px;
+    right: 12px;
+  }
+
+  .aco-player__main { padding: 12px; }
+  .aco-note,
+  .aco-example { padding: 14px; }
 }
 
 .lh-app-footer {
