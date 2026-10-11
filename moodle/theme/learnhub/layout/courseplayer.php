@@ -94,6 +94,10 @@ echo $OUTPUT->doctype();
                         if ($cm && !$oncurator) {
                             echo $player->render_pager();
                         }
+                        echo '<footer class="lh-player-foot">';
+                        echo $OUTPUT->learnhub_legal_nav();
+                        echo '<p>АЦО — Академия цифрового образования</p>';
+                        echo '</footer>';
                         echo $player->render_shell_end();
                         ?>
                     </section>
@@ -103,7 +107,6 @@ echo $OUTPUT->doctype();
     </div>
 </div>
 <?php
-echo $OUTPUT->learnhub_legal_nav();
 echo $OUTPUT->standard_end_of_body_html();
 ?>
 </body>

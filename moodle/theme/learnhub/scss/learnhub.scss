@@ -2474,6 +2474,25 @@ body.lh-student.lh-player {
 .aco-note { background: #FFF7ED; border-left: 4px solid #F59E0B; }
 .aco-example { background: $lh-p50; border-left: 4px solid $lh-p600; }
 
+.lh-player-foot {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid $lh-border;
+  color: $lh-ph;
+  font-size: .8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+
+  .lh-moodle-legal {
+    margin: 0 0 6px;
+    text-align: left;
+  }
+
+  .lh-moodle-legal a { color: $lh-p600; }
+
+  p { margin: 0; }
+}
+
 .aco-pager {
   display: flex;
   justify-content: space-between;

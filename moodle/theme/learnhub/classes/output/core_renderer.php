@@ -185,7 +185,9 @@ class core_renderer extends \theme_boost\output\core_renderer {
      */
     public function standard_end_of_body_html() {
         $html = '';
-        if ($this->learnhub_is_isolated_student()) {
+        $layout = $this->page->pagelayout ?? '';
+        $onplayer = in_array($layout, ['course', 'incourse'], true);
+        if ($this->learnhub_is_isolated_student() && !$onplayer) {
             $html .= '<footer class="lh-app-footer d-print-none">АЦО — Академия цифрового образования</footer>';
         }
         return $html . parent::standard_end_of_body_html();
