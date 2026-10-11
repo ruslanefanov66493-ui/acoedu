@@ -64,7 +64,7 @@ Cron Moodle и WP уже в compose (`moodle-cron`, `wp-cron`).
 1. В Moodle: Site administration → Server → HTTP — вернуть `curlsecurityblockedhosts` (или `MOODLE_BLOCK_PRIVATE_HOSTS=1` в `config-dist.php`).
 2. Edwiser: URL Moodle/WP на боевые https, новый SSO shared secret в Moodle `auth_edwiserbridge/sharedsecret` и WP option `aco_eb_sso_secret`.
 3. ЮKassa: shopId + секрет, webhook `https://www.acoedu.ru/?yookassa=callback` (плагин сам подписывается на HTTPS). Выключить COD «Онлайн-оплата». Чеклист: [docs/yookassa-precheck.md](../docs/yookassa-precheck.md).
-4. Сменить пароли администраторов WordPress и Moodle после первого входа.
+4. Сменить пароли admin / Admin123!.
 5. В Kinescope Allowed Domains — домен Moodle.
 6. `WP_DEBUG=0`, не публиковать порты 3306/6379.
 7. Почта: Unisender Go, DNS и ящики отдела — [docs/pochta-i-zayavki.md](../docs/pochta-i-zayavki.md).

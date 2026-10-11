@@ -92,6 +92,78 @@
         });
     }
 
+    function formChannel(form) {
+        return (form && form.getAttribute('data-channel')) || 'email';
+    }
+
+    function setChannel(formId, channel) {
+        var form = document.getElementById(formId);
+        if (!form) return;
+        form.setAttribute('data-channel', channel);
+        form.querySelectorAll('[data-for]').forEach(function (field) {
+            var on = field.getAttribute('data-for') === channel;
+            field.hidden = !on;
+            field.querySelectorAll('input').forEach(function (input) {
+                if (input.type === 'hidden') return;
+                input.required = on;
+            });
+        });
+        document.querySelectorAll('[data-channel-for="' + formId + '"] .aco-channel__btn').forEach(function (btn) {
+            btn.classList.toggle('is-active', btn.getAttribute('data-channel') === channel);
+        });
+        if (formId === 'aco-recovery-form') {
+            var hint = document.getElementById('recovery-hint');
+            if (hint) {
+                hint.textContent = channel === 'phone'
+                    ? 'Укажите номер — отправим код для сброса пароля.'
+                    : 'Укажите почту — отправим код для сброса пароля.';
+            }
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.aco-channel__btn');
+        if (!btn) return;
+        var bar = btn.closest('[data-channel-for]');
+        if (!bar) return;
+        setChannel(bar.getAttribute('data-channel-for'), btn.getAttribute('data-channel'));
+    });
+
+    function phoneDigits(value) {
+        var digits = String(value || '').replace(/\D/g, '');
+        if (digits.charAt(0) === '8' || digits.charAt(0) === '7') digits = digits.slice(1);
+        return digits.slice(0, 10);
+    }
+
+    function phoneOk(value) {
+        var digits = phoneDigits(value);
+        return digits.length === 10 && digits.charAt(0) === '9';
+    }
+
+    function openVerify(opts) {
+        document.getElementById('verify-email').value = opts.email || '';
+        document.getElementById('verify-phone').value = opts.phone || '';
+        document.getElementById('verify-channel').value = opts.channel || 'email';
+        document.getElementById('verify-context').value = opts.context;
+        var hint = document.getElementById('verify-hint');
+        var label = document.getElementById('verify-code-label');
+        if (opts.context === 'recovery') {
+            if (hint) {
+                hint.textContent = opts.channel === 'phone'
+                    ? 'Если номер есть в аккаунте, код уже отправлен. Если SMS нет — проверьте номер.'
+                    : 'Если почта есть в аккаунте, код уже отправлен. Если письма нет — проверьте адрес и папку «Спам».';
+            }
+            if (label) label.textContent = opts.channel === 'phone' ? 'Код из SMS' : 'Код из письма';
+        } else if (opts.channel === 'phone') {
+            if (hint) hint.textContent = 'Мы отправили 6-значный код по SMS на ' + (opts.phone || 'ваш номер') + '.';
+            if (label) label.textContent = 'Код из SMS';
+        } else {
+            if (hint) hint.textContent = 'Мы отправили 6-значный код на вашу почту.';
+            if (label) label.textContent = 'Код из письма';
+        }
+        showPanel('verify');
+    }
+
     /* ── goto triggers (data-goto) ───────────── */
     document.addEventListener('click', function (e) {
         var el = e.target.closest('[data-goto]');
@@ -122,8 +194,14 @@
             showError('login-error', '');
             setLoading(this, true);
             var nonce = this.querySelector('[name="aco_login_nonce"]').value;
+            var channel = formChannel(this);
+            if (channel === 'phone' && !phoneOk(this.phone.value)) {
+                setLoading(this, false);
+                showError('login-error', 'Укажите мобильный номер в формате +7 9XX');
+                return;
+            }
             post('aco_ajax_login', {
-                email: this.email.value,
+                login: channel === 'phone' ? this.phone.value : this.email.value,
                 password: this.password.value,
                 rememberme: this.rememberme ? this.rememberme.checked ? '1' : '' : '',
                 redirect_to: redirectTo
@@ -158,13 +236,17 @@
 
     function sendRegisterCode(errorElId, onDone) {
         var nonce = regForm.querySelector('[name="aco_register_nonce"]').value;
-        return post('aco_ajax_register', pendingRegistration, 'aco_register_nonce', nonce)
+        var action = pendingRegistration.channel === 'phone' ? 'aco_ajax_phone_register' : 'aco_ajax_register';
+        return post(action, pendingRegistration, 'aco_register_nonce', nonce)
             .then(function (res) {
                 if (onDone) onDone();
                 if (res.success) {
-                    document.getElementById('verify-email').value = pendingRegistration.email;
-                    document.getElementById('verify-context').value = 'register';
-                    showPanel('verify');
+                    openVerify({
+                        context: 'register',
+                        channel: pendingRegistration.channel,
+                        email: pendingRegistration.email,
+                        phone: pendingRegistration.phone
+                    });
                 } else {
                     showError(errorElId, res.data || 'Ошибка регистрации');
                 }
@@ -186,14 +268,22 @@
                 showError('register-error', 'Пароль должен содержать минимум 8 символов');
                 return;
             }
-            if (!emailAllowed(this.email.value)) {
+            var channel = formChannel(this);
+            if (channel === 'phone') {
+                if (!phoneOk(this.phone.value)) {
+                    showError('register-error', 'Укажите мобильный номер в формате +7 9XX');
+                    return;
+                }
+            } else if (!emailAllowed(this.email.value)) {
                 showError('register-error', publicEmailError());
                 return;
             }
             setLoading(this, true);
             pendingRegistration = {
+                channel: channel,
                 first_name: this.first_name.value,
-                email: this.email.value,
+                email: channel === 'email' ? this.email.value : '',
+                phone: channel === 'phone' ? this.phone.value : '',
                 password: this.password.value,
                 agree_terms: '1',
                 redirect_to: redirectTo
@@ -208,18 +298,28 @@
         recoveryForm.addEventListener('submit', function (e) {
             e.preventDefault();
             showError('recovery-error', '');
+            var channel = formChannel(this);
+            if (channel === 'phone' && !phoneOk(this.phone.value)) {
+                showError('recovery-error', 'Укажите мобильный номер в формате +7 9XX');
+                return;
+            }
             setLoading(this, true);
-            recoveryEmail = this.email.value;
+            recoveryEmail = channel === 'phone' ? this.phone.value : this.email.value;
             var nonce = this.querySelector('[name="aco_recovery_nonce"]').value;
-            post('aco_ajax_send_code', { email: recoveryEmail }, 'aco_recovery_nonce', nonce)
+            var action = channel === 'phone' ? 'aco_ajax_phone_send_code' : 'aco_ajax_send_code';
+            var payload = channel === 'phone' ? { phone: this.phone.value } : { email: this.email.value };
+            post(action, payload, 'aco_recovery_nonce', nonce)
                 .then(function (res) {
                     setLoading(recoveryForm, false);
                     if (res.success) {
-                        document.getElementById('verify-email').value = recoveryEmail;
-                        document.getElementById('verify-context').value = 'recovery';
-                        showPanel('verify');
+                        openVerify({
+                            context: 'recovery',
+                            channel: channel,
+                            email: channel === 'email' ? recoveryEmail : '',
+                            phone: channel === 'phone' ? recoveryEmail : ''
+                        });
                     } else {
-                        showError('recovery-error', res.data || 'Ошибка. Проверьте email');
+                        showError('recovery-error', res.data || 'Ошибка. Проверьте данные');
                     }
                 }).catch(function () {
                     setLoading(recoveryForm, false);
@@ -237,10 +337,17 @@
             setLoading(this, true);
             var nonce   = this.querySelector('[name="aco_verify_nonce"]').value;
             var context = this.context.value; // 'register' | 'recovery'
-            var action  = context === 'register' ? 'aco_ajax_verify_register' : 'aco_ajax_verify_code';
+            var channel = document.getElementById('verify-channel').value || 'email';
+            var action;
+            if (channel === 'phone') {
+                action = context === 'register' ? 'aco_ajax_phone_verify_register' : 'aco_ajax_phone_verify_code';
+            } else {
+                action = context === 'register' ? 'aco_ajax_verify_register' : 'aco_ajax_verify_code';
+            }
 
             post(action, {
                 email: this.email.value,
+                phone: document.getElementById('verify-phone').value,
                 code: (this.code.value || '').replace(/\D/g, ''),
                 redirect_to: redirectTo
             }, 'aco_verify_nonce', nonce).then(function (res) {
@@ -255,6 +362,7 @@
                     window.location.href = (res.data && res.data.redirect) || '/account/';
                 } else {
                     document.getElementById('newpass-email').value = verifyForm.email.value;
+                    document.getElementById('newpass-phone').value = document.getElementById('verify-phone').value;
                     document.getElementById('newpass-token').value = res.data.token;
                     showPanel('newpass');
                 }
@@ -302,6 +410,7 @@
             var nonce = this.querySelector('[name="aco_newpass_nonce"]').value;
             post('aco_ajax_new_password', {
                 email: this.email.value,
+                phone: document.getElementById('newpass-phone').value,
                 token: this.token.value,
                 password: this.password.value,
                 redirect_to: redirectTo

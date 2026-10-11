@@ -16,8 +16,8 @@
         var thumbStyle = c.image ? ' style="background-image:url(\'' + esc(c.image) + '\')"' : '';
         var isDone = !!c.completed || c.progress >= 100;
         var btnClass = isDone ? 'lh-course-card__btn--success' : 'lh-course-card__btn--primary';
-        var btnLabel = isDone ? 'Скачать сертификат' : (c.progress > 0 ? 'Продолжить обучение' : 'Начать обучение');
-        var btnHref = isDone ? c.certificate : (c.continueurl || c.url);
+        var btnLabel = isDone ? 'Курс пройден — открыть' : (c.progress > 0 ? 'Продолжить обучение' : 'Начать обучение');
+        var btnHref = c.continueurl || c.url;
         var openHref = c.continueurl || c.url;
         var barClass = isDone ? ' is-done' : '';
         var meta = [];

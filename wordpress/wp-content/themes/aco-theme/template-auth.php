@@ -59,9 +59,13 @@ $titles = [
         <!-- ── LOGIN FORM ──────────────────────────────── -->
         <div class="aco-auth-panel<?php echo $tab === 'login' ? ' is-active' : ''; ?>" data-panel="login">
             <h1 class="aco-auth-title"><?php echo esc_html( $titles['login'] ); ?></h1>
-            <form class="aco-auth-form" id="aco-login-form" novalidate>
+            <div class="aco-channel" data-channel-for="aco-login-form">
+                <button type="button" class="aco-channel__btn is-active" data-channel="email">Почта</button>
+                <button type="button" class="aco-channel__btn" data-channel="phone">Телефон</button>
+            </div>
+            <form class="aco-auth-form" id="aco-login-form" data-channel="email" novalidate>
                 <?php wp_nonce_field( 'aco_login', 'aco_login_nonce' ); ?>
-                <div class="aco-field">
+                <div class="aco-field" data-for="email">
                     <label for="login-email">Электронная почта</label>
                     <input type="email" id="login-email" name="email"
                            placeholder="ivan@mail.ru"
@@ -70,6 +74,14 @@ $titles = [
                            enterkeyhint="next"
                            spellcheck="false"
                            required>
+                </div>
+                <div class="aco-field" data-for="phone" hidden>
+                    <label for="login-phone">Мобильный телефон</label>
+                    <input type="tel" id="login-phone" name="phone"
+                           placeholder="+7 900 000-00-00"
+                           autocomplete="tel"
+                           inputmode="tel"
+                           enterkeyhint="next">
                 </div>
                 <div class="aco-field">
                     <label for="login-pass">Пароль</label>
@@ -106,7 +118,11 @@ $titles = [
         <!-- ── REGISTER FORM ───────────────────────────── -->
         <div class="aco-auth-panel<?php echo $tab === 'register' ? ' is-active' : ''; ?>" data-panel="register">
             <h1 class="aco-auth-title"><?php echo esc_html( $titles['register'] ); ?></h1>
-            <form class="aco-auth-form" id="aco-register-form" novalidate>
+            <div class="aco-channel" data-channel-for="aco-register-form">
+                <button type="button" class="aco-channel__btn is-active" data-channel="email">Почта</button>
+                <button type="button" class="aco-channel__btn" data-channel="phone">Телефон</button>
+            </div>
+            <form class="aco-auth-form" id="aco-register-form" data-channel="email" novalidate>
                 <?php wp_nonce_field( 'aco_register', 'aco_register_nonce' ); ?>
                 <div class="aco-field">
                     <label for="reg-name">Имя</label>
@@ -116,7 +132,7 @@ $titles = [
                            enterkeyhint="next"
                            required>
                 </div>
-                <div class="aco-field">
+                <div class="aco-field" data-for="email">
                     <label for="reg-email">Электронная почта</label>
                     <input type="email" id="reg-email" name="email"
                            placeholder="ivan@mail.ru"
@@ -126,6 +142,15 @@ $titles = [
                            spellcheck="false"
                            required>
                     <p class="aco-field-hint"><?php echo esc_html( aco_email_field_hint() ); ?></p>
+                </div>
+                <div class="aco-field" data-for="phone" hidden>
+                    <label for="reg-phone">Мобильный телефон</label>
+                    <input type="tel" id="reg-phone" name="phone"
+                           placeholder="+7 900 000-00-00"
+                           autocomplete="tel"
+                           inputmode="tel"
+                           enterkeyhint="next">
+                    <p class="aco-field-hint">Код подтверждения придёт по SMS. Почту для чеков укажете при покупке курса.</p>
                 </div>
                 <div class="aco-field">
                     <label for="reg-pass">Пароль</label>
@@ -162,10 +187,14 @@ $titles = [
         <!-- ── RECOVERY: enter email ───────────────────── -->
         <div class="aco-auth-panel<?php echo $tab === 'recovery' ? ' is-active' : ''; ?>" data-panel="recovery">
             <h1 class="aco-auth-title"><?php echo esc_html( $titles['recovery'] ); ?></h1>
-            <p class="aco-auth-hint">Укажите почту — отправим код для сброса пароля.</p>
-            <form class="aco-auth-form" id="aco-recovery-form" novalidate>
+            <div class="aco-channel" data-channel-for="aco-recovery-form">
+                <button type="button" class="aco-channel__btn is-active" data-channel="email">Почта</button>
+                <button type="button" class="aco-channel__btn" data-channel="phone">Телефон</button>
+            </div>
+            <p class="aco-auth-hint" id="recovery-hint">Укажите почту — отправим код для сброса пароля.</p>
+            <form class="aco-auth-form" id="aco-recovery-form" data-channel="email" novalidate>
                 <?php wp_nonce_field( 'aco_recovery', 'aco_recovery_nonce' ); ?>
-                <div class="aco-field">
+                <div class="aco-field" data-for="email">
                     <label for="rec-email">Электронная почта</label>
                     <input type="email" id="rec-email" name="email"
                            placeholder="ivan@mail.ru"
@@ -175,6 +204,14 @@ $titles = [
                            spellcheck="false"
                            required>
                     <p class="aco-field-hint"><?php echo esc_html( aco_email_field_hint() ); ?></p>
+                </div>
+                <div class="aco-field" data-for="phone" hidden>
+                    <label for="rec-phone">Мобильный телефон</label>
+                    <input type="tel" id="rec-phone" name="phone"
+                           placeholder="+7 900 000-00-00"
+                           autocomplete="tel"
+                           inputmode="tel"
+                           enterkeyhint="send">
                 </div>
                 <div class="aco-auth-error" id="recovery-error" role="alert" hidden></div>
                 <button type="submit" class="aco-auth-submit">
@@ -188,13 +225,15 @@ $titles = [
         <!-- ── RECOVERY: enter code ────────────────────── -->
         <div class="aco-auth-panel" data-panel="verify">
             <h1 class="aco-auth-title">Введите код</h1>
-            <p class="aco-auth-hint">Мы отправили 6-значный код на вашу почту.</p>
+            <p class="aco-auth-hint" id="verify-hint">Мы отправили 6-значный код на вашу почту.</p>
             <form class="aco-auth-form" id="aco-verify-form" novalidate>
                 <?php wp_nonce_field( 'aco_verify_code', 'aco_verify_nonce' ); ?>
                 <input type="hidden" id="verify-email" name="email" value="">
+                <input type="hidden" id="verify-phone" name="phone" value="">
+                <input type="hidden" id="verify-channel" name="channel" value="email">
                 <input type="hidden" id="verify-context" name="context" value="recovery">
                 <div class="aco-field">
-                    <label for="verify-code">Код из письма</label>
+                    <label for="verify-code" id="verify-code-label">Код из письма</label>
                     <input type="text" id="verify-code" name="code"
                            placeholder="123456"
                            maxlength="6"
@@ -219,6 +258,7 @@ $titles = [
             <form class="aco-auth-form" id="aco-newpass-form" novalidate>
                 <?php wp_nonce_field( 'aco_new_password', 'aco_newpass_nonce' ); ?>
                 <input type="hidden" id="newpass-email" name="email" value="">
+                <input type="hidden" id="newpass-phone" name="phone" value="">
                 <input type="hidden" id="newpass-token" name="token" value="">
                 <div class="aco-field">
                     <label for="new-pass">Новый пароль</label>

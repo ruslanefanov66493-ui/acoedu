@@ -23,6 +23,18 @@ echo html_writer::start_div('lh-teach');
 echo html_writer::tag('h1', 'Панель преподавателя');
 echo html_writer::tag('p', 'Проверка работ и прогресс по вашим курсам.', ['class' => 'lh-teach__lead']);
 
+echo html_writer::start_div('lh-teach__hero');
+echo html_writer::start_div('lh-teach__hero-copy');
+echo html_writer::tag('h2', 'Онлайн-встречи');
+echo html_writer::tag('p', 'Назначьте дату, отметьте студентов и отправьте приглашения.');
+echo html_writer::end_div();
+echo html_writer::link(
+    new moodle_url('/theme/learnhub/teacher/meeting.php'),
+    'Создать онлайн-встречу',
+    ['class' => 'lh-teach__cta']
+);
+echo html_writer::end_div();
+
 echo html_writer::start_div('lh-teach__stats');
 echo html_writer::start_div('lh-teach__stat');
 echo html_writer::tag('strong', (string) $overview['stats']['courses']);

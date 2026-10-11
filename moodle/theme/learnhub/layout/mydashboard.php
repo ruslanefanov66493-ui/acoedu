@@ -93,6 +93,8 @@ $templatecontext = [
     'homeurl' => $CFG->wwwroot . '/',
     'myurl' => $CFG->wwwroot . '/my/',
     'mycoursesurl' => $CFG->wwwroot . '/my/courses.php',
+    'meetingsurl' => $CFG->wwwroot . '/theme/learnhub/meetings.php',
+    'ismeetings' => ($currentpath === '/theme/learnhub/meetings.php'),
     'profileurl' => $CFG->wwwroot . '/user/profile.php',
     'logouturl' => $CFG->wwwroot . '/login/logout.php?sesskey=' . sesskey(),
     'acologo' => (new moodle_url('/theme/learnhub/pix/aco-logo.png'))->out(false),

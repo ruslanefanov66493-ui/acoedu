@@ -91,7 +91,7 @@ body {
 
 // ── Dashboard course cards ────────────────────────────────────────────────────
 // Figma: 2 cards (width ~554px), border-radius 20px, shadow-md, white bg
-// Progress bar, Продолжить / Скачать сертификат buttons
+// Progress bar, Продолжить обучение buttons
 .dashboard-card,
 .card.dashboard-card {
   background: $lh-white !important;
@@ -369,6 +369,8 @@ body.lh-student:not(.pagelayout-login) {
   body.lh-student.lh-player .lh-sidebar {
     position: static;
     width: auto;
+    max-width: calc(100% - 32px);
+    box-sizing: border-box;
     margin: 12px 16px 0;
     display: flex;
     flex-direction: row;
@@ -378,10 +380,10 @@ body.lh-student:not(.pagelayout-login) {
   }
 
   .lh-side__item {
-    flex: 1 1 calc(25% - 8px);
+    flex: 1 0 auto;
     margin-bottom: 0;
-    padding: 10px 6px;
-    font-size: .75rem;
+    padding: 10px 12px;
+    font-size: .8125rem;
     white-space: nowrap;
   }
 
@@ -602,7 +604,7 @@ body.lh-student:not(.pagelayout-login) {
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
-// Figma: Primary = #4F46E5, Success = #10B981 (certificate), outline
+// Figma: Primary = #4F46E5, Success = #10B981, outline
 .btn-primary,
 input[type="submit"].btn-primary {
   background: $lh-p600 !important;
@@ -636,7 +638,7 @@ input[type="submit"].btn-primary {
   &:hover { background: $lh-p50 !important; }
 }
 
-// "Продолжить обучение" / "Скачать сертификат" button row
+// "Продолжить обучение" button row
 .enrolment-buttons,
 .singlebutton {
   display: flex;
@@ -836,6 +838,28 @@ body.lh-student.pagelayout-login {
     overflow-wrap: anywhere;
   }
 
+  .lh-login__sso {
+    margin: 12px 0 0;
+    font-size: .875rem;
+    line-height: 1.45;
+    color: $lh-text;
+  }
+
+  .lh-login__sso a {
+    color: $lh-p600;
+  }
+
+  .lh-moodle-legal {
+    margin: 16px 0 0;
+    font-size: .8125rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .lh-moodle-legal a {
+    color: $lh-p600;
+  }
+
   .login-form label {
     display: block;
     margin: 0 0 6px;
@@ -995,31 +1019,6 @@ body.lh-student.pagelayout-login {
   border-radius: $lh-r-xl !important;
   padding: 28px !important;
   box-shadow: $lh-sh-md !important;
-}
-
-// ── Certificate ───────────────────────────────────────────────────────────────
-.certificate-view,
-.mod_certificate-view {
-  background: $lh-white !important;
-  border-radius: $lh-r-xl !important;
-  padding: 28px !important;
-  text-align: center;
-
-  h2 { color: $lh-heading; font-size: 1.75rem; font-weight: 700; }
-  p  { color: $lh-muted; }
-
-  .downloadbutton a {
-    display: inline-block;
-    padding: 14px 32px;
-    background: $lh-success !important;
-    color: $lh-white !important;
-    font-weight: 700;
-    border-radius: $lh-r-md;
-    margin-top: 20px;
-    text-decoration: none;
-    transition: opacity .15s;
-    &:hover { opacity: .85; }
-  }
 }
 
 // ── Forms (common) ────────────────────────────────────────────────────────────
@@ -1596,100 +1595,9 @@ body.lh-student.pagelayout-mycourses {
   }
 }
 
-// ── Certificate page ──────────────────────────────────────────────────────────
-.lh-cert {
-  max-width: 720px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 8px 0 48px;
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: $lh-heading;
-    margin: 0 0 28px;
-  }
-}
-
-.lh-cert--pending {
-  text-align: left;
-
-  p { color: $lh-muted; margin-bottom: 20px; }
-
-  .lh-course-card__btn { display: inline-block; padding: 12px 24px; }
-}
-
-.lh-cert__card {
-  background: $lh-white;
-  border: 1px solid $lh-heading;
-  border-radius: $lh-r-xl;
-  padding: 48px 40px 32px;
-  margin-bottom: 24px;
-}
-
-.lh-cert__kicker {
-  color: $lh-p600;
-  font-weight: 800;
-  letter-spacing: .12em;
-  margin: 0 0 16px;
-}
-
-.lh-cert__lead {
-  color: $lh-text;
-  margin: 0 0 8px;
-}
-
-.lh-cert__name {
-  font-size: 2rem;
-  font-weight: 800;
-  color: $lh-heading;
-  margin: 8px 0 12px;
-}
-
-.lh-cert__course {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: $lh-heading;
-  margin: 8px 0 32px;
-}
-
-.lh-cert__meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  color: $lh-ph;
-  font-size: .875rem;
-  border-top: 1px solid $lh-border;
-  padding-top: 16px;
-}
-
-.lh-cert__actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  .lh-course-card__btn {
-    min-width: 180px;
-    cursor: pointer;
-    border: 0;
-  }
-
-  .lh-course-card__btn--ghost {
-    border: 1.5px solid $lh-p200;
-  }
-}
-
-@media print {
-  .lh-navbar, .lh-sidebar, .lh-cert__actions, #page-footer { display: none !important; }
-  body.lh-student { padding: 0; }
-  body.lh-student #page-wrapper { padding: 0; }
-  .lh-cert__card { box-shadow: none; }
-}
-
 // ── Course player (student programme view) ───────────────────────────────────
 body.lh-student.lh-player {
-  // Same chrome as Панель / Сертификат: header + switcher + padded main.
+  // Same chrome as Панель: header + switcher + padded main.
   @media (min-width: #{$lh-bp-lg + 1}) {
     .lh-sidebar { display: block; }
   }
@@ -2205,7 +2113,6 @@ body.aco-nav-lock {
 .aco-special--test { border: 1px dashed $lh-p200; background: $lh-p50; }
 .aco-special--final { border: 1px solid $lh-p600; background: #EEF2FF; }
 .aco-cert { border: 1px solid $lh-border; background: $lh-white; }
-.aco-cert.is-ready { border-color: $lh-success; }
 .aco-curator.is-unread { border-color: $lh-p600; background: $lh-p50; }
 .aco-curator.is-current {
   border-color: $lh-p600;
@@ -2849,27 +2756,6 @@ body.lh-student.lh-player {
   }
 }
 
-@media (max-width: $lh-bp-md) {
-  .lh-cert {
-    padding: 8px 12px 32px;
-
-    h1 { font-size: 1.35rem; }
-  }
-
-  .lh-cert__card { padding: 28px 16px 20px; }
-
-  .lh-cert__name { font-size: 1.5rem; overflow-wrap: anywhere; }
-
-  .lh-cert__course { font-size: 1.05rem; overflow-wrap: anywhere; }
-
-  .lh-cert__meta { flex-direction: column; }
-
-  .lh-cert__actions .lh-course-card__btn {
-    min-width: 0;
-    width: 100%;
-  }
-}
-
 .lh-account-page,
 .lh-teach {
   max-width: 920px;
@@ -2965,7 +2851,13 @@ body.lh-student.lh-player {
   &.is-alert strong { color: #C2410C; }
 }
 
-.lh-teach__meta { color: #6B7280; font-size: .875rem; margin: 0; }
+.lh-teach__meta {
+  color: #6B7280;
+  font-size: .875rem;
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 
 .lh-teach__link {
   font-weight: 600;
@@ -3060,98 +2952,484 @@ body.lh-student.lh-player {
 .lh-teach__empty,
 .lh-teach__list { background: #fff; border-radius: 16px; padding: 18px; }
 
-.lh-curator {
-  max-width: 720px;
-  margin: 8px auto 48px;
-  padding: 0 8px 24px;
-}
-.lh-curator--inplayer {
+.lh-curator-admin {
   max-width: none;
   margin: 0;
-  padding: 0 0 32px;
-}
-.lh-curator--inplayer h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -.02em;
-}
-.lh-curator h1 {
-  font-size: 1.75rem;
-  margin: 0 0 8px;
-  color: $lh-heading;
-}
-.lh-curator__lead {
-  color: $lh-muted;
-  margin: 0 0 18px;
-  line-height: 1.55;
-}
-.lh-curator__chat {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 180px;
-  max-height: 52vh;
-  overflow-y: auto;
-  padding: 12px;
-  margin-bottom: 14px;
-  background: $lh-white;
-  border: 1px solid $lh-border;
-  border-radius: $lh-r-lg;
-}
-.lh-curator__empty {
-  margin: auto;
-  color: $lh-ph;
-  text-align: center;
-  padding: 24px 8px;
-}
-.lh-curator__bubble {
-  max-width: 85%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  p { margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
-  &.is-mine {
-    align-self: flex-end;
-    background: $lh-p600;
-    color: #fff;
-    .lh-curator__meta { color: rgba(255,255,255,.75); }
-  }
-  &.is-curator {
-    align-self: flex-start;
-    background: $lh-n100;
-    color: $lh-heading;
-  }
-}
-.lh-curator__meta {
-  display: block;
-  font-size: .6875rem;
-  font-weight: 600;
-  color: $lh-ph;
-}
-.lh-curator__time { color: $lh-ph; font-size: .75rem; }
-.lh-curator__form {
-  display: grid;
-  gap: 10px;
-  textarea {
-    width: 100%;
-    border: 1px solid $lh-border;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font: inherit;
-    min-height: 96px;
-    resize: vertical;
-  }
-  button { justify-self: start; min-height: 44px; }
+  padding: 0 0 8px;
+
+  h1 { margin-bottom: 4px; }
+  .lh-teach__lead { display: none; }
 }
 
-.lh-curator-admin .lh-curator__chat,
-.lh-curator-admin .lh-curator__form {
-  max-width: 720px;
+.lh-chatbox {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  height: min(760px, calc(100vh - 210px));
+  min-height: 480px;
+  background: $lh-white;
+  border: 1px solid $lh-border;
+  border-radius: $lh-r-xl;
+  box-shadow: $lh-sh-md;
+  overflow: hidden;
+}
+
+.lh-chat__list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid $lh-border;
+  background: $lh-white;
+  overflow-y: auto;
+}
+
+.lh-chat__list-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 16px 16px 10px;
+  background: $lh-white;
+  font-weight: 700;
+  color: $lh-heading;
+}
+
+.lh-chat__row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  color: $lh-text !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid $lh-n100;
+
+  &:hover { background: $lh-bg; }
+  &.is-active { background: $lh-p50; }
+  &.is-unread b,
+  &.is-unread .lh-chat__row-preview { color: $lh-heading; font-weight: 700; }
+}
+
+.lh-chat__row-main { min-width: 0; display: block; }
+.lh-chat__row-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  b {
+    color: $lh-heading;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  time { flex: none; color: $lh-ph; font-size: .75rem; }
+}
+.lh-chat__row-preview {
+  display: block;
+  margin-top: 2px;
+  color: $lh-ph;
+  font-size: .8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lh-chat__badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: $lh-r-full;
+  background: $lh-p600;
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lh-chat__pane,
+.lh-chatpane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: $lh-white;
+}
+
+.lh-chat__placeholder,
+.lh-chat__empty {
+  margin: auto;
+  max-width: 280px;
+  padding: 24px;
+  text-align: center;
+  color: $lh-ph;
+  line-height: 1.5;
+}
+
+.lh-chat__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 10px 16px;
+  border-bottom: 1px solid $lh-border;
+  background: $lh-white;
+}
+
+.lh-chat__back {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  color: $lh-heading !important;
+  text-decoration: none !important;
+  background: $lh-n100;
+  font-size: 1.1rem;
+}
+
+.lh-chat__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $lh-g-primary;
+  color: #fff;
+  font-weight: 700;
+  font-size: .85rem;
+  letter-spacing: .02em;
+}
+
+.lh-chat__who {
+  min-width: 0;
+  strong, span { display: block; }
+  strong {
+    color: $lh-heading;
+    font-size: .95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  span {
+    color: $lh-ph;
+    font-size: .75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.lh-chat__log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #F3F4F8;
+}
+
+.lh-chat__day {
+  align-self: center;
+  margin: 6px 0;
+  padding: 4px 10px;
+  border-radius: $lh-r-full;
+  background: rgba(255, 255, 255, .85);
+  color: $lh-ph;
+  font-size: .7rem;
+  font-weight: 700;
+}
+
+.lh-chat__msg {
+  display: flex;
+  max-width: min(78%, 460px);
+  &.is-mine { align-self: flex-end; }
+  &.is-theirs { align-self: flex-start; }
+}
+
+.lh-chat__bubble {
+  padding: 8px 12px 6px;
+  p {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    line-height: 1.45;
+  }
+  time {
+    display: block;
+    margin-top: 4px;
+    text-align: right;
+    font-size: .68rem;
+    opacity: .72;
+  }
+  .is-mine & {
+    background: $lh-p600;
+    color: #fff;
+    border-radius: 16px 16px 4px 16px;
+  }
+  .is-theirs & {
+    background: $lh-white;
+    color: $lh-heading;
+    border: 1px solid $lh-border;
+    border-radius: 16px 16px 16px 4px;
+  }
+}
+
+.lh-chat__photo {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 6px;
+  padding: 3px;
+  border-radius: 14px;
+  background: #fff;
+  img {
+    display: block;
+    max-width: 260px;
+    max-height: 200px;
+    border-radius: 11px;
+    object-fit: cover;
+  }
+}
+
+.lh-chat__file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  min-width: 190px;
+  max-width: 280px;
+  padding: 8px;
+  border-radius: 12px;
+  text-decoration: none !important;
+  .is-mine & { background: rgba(255, 255, 255, .16); color: #fff !important; }
+  .is-theirs & { background: $lh-n100; color: $lh-heading !important; }
+  b, small { display: block; }
+  b {
+    font-size: .8125rem;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+  }
+  small { font-size: .7rem; opacity: .75; }
+}
+
+.lh-chat__file-ext {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  .is-mine & { background: rgba(255, 255, 255, .22); }
+  .is-theirs & { background: $lh-white; color: $lh-p700; }
+}
+
+.lh-chat__file-meta { min-width: 0; }
+
+.lh-chat__compose {
+  border-top: 1px solid $lh-border;
+  background: $lh-white;
+  padding: 8px 12px 10px;
+}
+
+.lh-chat__warn {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #FEF2F2;
+  color: #B91C1C;
+  font-size: .8125rem;
+}
+
+.lh-chat__picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lh-chat__pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  padding: 4px 6px 4px 8px;
+  border-radius: 999px;
+  background: $lh-n100;
+  color: $lh-heading;
+  font-size: .75rem;
+  img {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  button {
+    border: 0;
+    background: transparent;
+    color: $lh-ph;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 4px;
+    cursor: pointer;
+  }
+}
+
+.lh-chat__bar {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: end;
+}
+
+.lh-chat__clip .visually-hidden,
+.lh-chat__send .visually-hidden,
+.lh-chat__bar > .visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.lh-chat__clip,
+.lh-chat__send {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex: none;
+}
+
+.lh-chat__clip {
+  background: $lh-n100;
+  color: $lh-muted;
+  margin: 0;
+  input { display: none; }
+  &:hover { background: $lh-p50; color: $lh-p700; }
+}
+
+.lh-chat__compose textarea {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 44px;
+  max-height: 140px;
+  margin: 0;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 22px;
+  background: $lh-n100;
+  color: $lh-heading;
+  font: inherit;
+  line-height: 1.4;
+  resize: none;
+  box-shadow: none;
+  &:focus {
+    outline: 2px solid $lh-p200;
+    background: $lh-white;
+  }
+}
+
+.lh-chat__send {
+  background: $lh-p600;
+  color: #fff;
+  &:hover { background: $lh-p700; }
+  &:disabled { opacity: .4; cursor: default; }
+}
+
+.lh-chat__hint {
+  margin: 6px 4px 0;
+  color: $lh-ph;
+  font-size: .7rem;
+}
+
+.aco-player:has(.lh-chatpane) {
+  .aco-player__main {
+    max-width: none;
+    padding: 0;
+    display: flex;
+    min-height: calc(100vh - 160px);
+  }
+  .aco-player__core--curator {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: calc(100vh - 160px);
+    > [role="main"] {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+  }
+  .lh-chatpane { flex: 1; min-height: 0; }
+}
+
+@media (max-width: $lh-bp-lg) {
+  .aco-player:has(.lh-chatpane) {
+    .aco-player__main,
+    .aco-player__core--curator {
+      min-height: calc(100vh - 250px);
+    }
+    .lh-chatpane {
+      min-height: calc(100vh - 250px);
+      max-height: calc(100vh - 250px);
+    }
+  }
+}
+
+@media (max-width: $lh-bp-md) {
+  .lh-chatbox {
+    grid-template-columns: 1fr;
+    height: min(760px, calc(100dvh - 190px));
+    min-height: 0;
+  }
+  .lh-chatbox.is-thread .lh-chat__list { display: none; }
+  .lh-chatbox:not(.is-thread) .lh-chat__pane { display: none; }
+  .lh-chat__back { display: inline-flex; }
 }
 
 @media (max-width: $lh-bp-sm) {
   .lh-side__item {
-    font-size: .7rem;
-    padding: 10px 4px;
+    flex: 1 1 calc(50% - 8px);
+    font-size: .8125rem;
+    padding: 10px 8px;
+  }
+
+  body.lh-cabinet:not(.pagelayout-login),
+  body.lh-teacher:not(.pagelayout-login) {
+    #page.drawers .main-inner,
+    #topofscroll.main-inner,
+    .main-inner {
+      padding: 12px 12px 28px !important;
+    }
   }
 }
 
@@ -3402,6 +3680,7 @@ body.lh-student.lh-player {
 .lh-build__badge--practice, .lh-build__badge--final { background: #ECFDF5; color: #047857; }
 .lh-build__badge--test, .lh-build__badge--finaltest { background: #FFF7ED; color: #C2410C; }
 .lh-build__badge--page, .lh-build__badge--summary { background: #F3F4F6; color: #374151; }
+.lh-build__badge--meeting { background: #EEF2FF; color: #3730A3; }
 
 .lh-build__btn {
   display: inline-flex;
@@ -4474,4 +4753,455 @@ body.lh-player.path-mod-assign {
     grid-template-columns: auto 1fr;
     .lh-teach__badge { grid-column: 2; justify-self: start; }
   }
+}
+
+.lh-teach__hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin: 0 0 18px;
+}
+
+.lh-teach__hero--plain {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+.lh-teach__hero h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  color: #111827;
+}
+
+.lh-teach__hero p {
+  margin: 0;
+  color: #6B7280;
+}
+
+.lh-teach__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: #4F46E5;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: .9375rem;
+  line-height: 1.2;
+  text-decoration: none !important;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { background: #4338CA; color: #fff !important; }
+}
+
+.lh-teach__note {
+  background: #EEF2FF;
+  color: #3730A3;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 0 0 14px;
+}
+
+.lh-teach__form label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+}
+
+.lh-teach__input,
+.lh-teach__form select,
+.lh-teach__form textarea {
+  width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  color: #111827;
+  background: #fff;
+}
+
+.lh-teach__form select.custom-select {
+  height: auto;
+  min-height: 46px;
+  line-height: 1.5;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 2.5rem 10px 12px;
+  background-color: #fff;
+}
+
+.lh-teach__form label.lh-teach__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 600;
+  color: #111827;
+  font-size: .9375rem;
+
+  input { flex: none; margin-top: 3px; }
+
+  small {
+    min-width: 0;
+    font-weight: 500;
+    color: #6B7280;
+    overflow-wrap: anywhere;
+  }
+}
+
+.lh-meet-person {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lh-meet-person__name,
+.lh-meet-person small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.lh-teach__form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.lh-teach__danger {
+  margin-top: 8px;
+  background: transparent;
+  border: 0;
+  color: #B91C1C;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.lh-meet-people__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+}
+
+.lh-meet-people__list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #F9FAFB;
+}
+
+.lh-meet__day {
+  margin: 18px 0 10px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #6B7280;
+}
+
+.lh-meet__card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin: 0 0 10px;
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+    color: #111827;
+  }
+
+  &.is-live { border-color: #C7D2FE; }
+  &.is-done { opacity: .72; }
+}
+
+.lh-meet__time {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #4F46E5;
+  letter-spacing: -.02em;
+}
+
+.lh-meet__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #6B7280;
+  font-size: .875rem;
+}
+
+.lh-meet__intro {
+  margin: 8px 0 0;
+  color: #374151;
+}
+
+.lh-meet__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.lh-meet__wait {
+  color: #6B7280;
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+.lh-meet__join-title {
+  margin: 8px 0 16px;
+  font-size: 1.75rem;
+}
+
+.lh-teach__badge--live {
+  background: #EEF2FF;
+  color: #4338CA;
+}
+
+body.lh-meetings {
+  #page-header,
+  #page-navbar,
+  .breadcrumb,
+  .activity-header {
+    display: none !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .lh-teach__hero { flex-direction: column; align-items: stretch; }
+  .lh-teach__cta { width: 100%; }
+  .lh-meet__card { grid-template-columns: 1fr; }
+  .lh-meet__actions { align-items: stretch; }
+}
+
+.lh-teach.lh-teach--students { max-width: 1120px; }
+
+.lh-teach--students .lh-teach__stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.lh-stu__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  h1 { margin: 0; }
+  .lh-teach__cta { flex: none; }
+}
+
+a.lh-teach__stat {
+  text-decoration: none !important;
+  color: inherit !important;
+
+  &.is-active { border-color: #4F46E5; box-shadow: inset 0 0 0 1px #4F46E5; }
+}
+
+.lh-stu__list { display: grid; gap: 12px; }
+
+.lh-stu {
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 16px;
+  padding: 16px 18px;
+
+  &.is-wait { border-color: #FDBA74; }
+  &.is-rework { border-color: #FECACA; }
+}
+
+.lh-stu__top {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.lh-stu__id {
+  min-width: 0;
+
+  strong {
+    display: block;
+    color: #111827;
+    font-size: 1rem;
+  }
+
+  span {
+    display: block;
+    color: #6B7280;
+    font-size: .8125rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.lh-stu__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.lh-stu__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .875rem;
+  text-decoration: none !important;
+
+  &--primary { background: #4F46E5; color: #fff !important; }
+  &--ghost {
+    background: #fff;
+    color: #4338CA !important;
+    border: 1px solid #C7D2FE;
+  }
+}
+
+.lh-stu__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F97316;
+}
+
+.lh-stu__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 8px;
+
+  .lh-course-card__progress { margin: 0; flex: 1; }
+
+  strong {
+    color: #111827;
+    font-size: .875rem;
+    min-width: 2.6rem;
+    text-align: right;
+  }
+}
+
+.lh-stu__sum {
+  margin: 0;
+  color: #4B5563;
+  font-size: .875rem;
+}
+
+.lh-stu__tasks {
+  margin-top: 8px;
+
+  summary {
+    cursor: pointer;
+    width: fit-content;
+    color: #4F46E5;
+    font-weight: 700;
+    font-size: .8125rem;
+    list-style: none;
+
+    &::-webkit-details-marker { display: none; }
+  }
+}
+
+.lh-stu__task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #F3F4F6;
+  color: #111827 !important;
+  text-decoration: none !important;
+  font-size: .875rem;
+
+  &:hover .lh-stu__task-name { color: #4F46E5; }
+  &.is-static { color: #6B7280 !important; }
+}
+
+.lh-stu__task-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .lh-teach--students .lh-teach__stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 800px) {
+  .lh-stu__head { flex-direction: column; align-items: stretch; }
+  .lh-stu__top { grid-template-columns: 44px minmax(0, 1fr); }
+  .lh-stu__actions { grid-column: 1 / -1; justify-content: stretch; }
+  .lh-stu__btn { flex: 1; justify-content: center; }
+  .lh-meet__actions .lh-teach__cta,
+  .lh-meet__actions a,
+  .lh-meet__actions button { width: 100%; justify-content: center; }
+  .lh-teach__form-actions { align-items: stretch; }
+  .lh-teach__form-actions .lh-teach__cta,
+  .lh-teach__form-actions a,
+  .lh-teach__form-actions button { width: 100%; justify-content: center; }
+}
+
+@media (max-width: $lh-bp-sm) {
+  .lh-teach--students .lh-teach__stats { grid-template-columns: 1fr; }
+  .lh-stu { padding: 14px; }
+  .lh-stu__task { align-items: flex-start; }
+  .lh-stu__task .lh-teach__badge { flex: none; }
+  .lh-stu__task-name { white-space: normal; }
+  .lh-hw__decide { padding: 16px; }
+  .lh-hw__btn { width: 100%; }
+  .lh-chatbox {
+    height: calc(100dvh - 160px);
+    min-height: 280px;
+    border-radius: 16px;
+  }
+  .lh-chat__head { min-height: 56px; padding: 8px 12px; }
+  .lh-chat__compose {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+  .lh-chat__hint { display: none; }
+  .lh-chat__bar { grid-template-columns: 40px minmax(0, 1fr) 40px; }
+  .lh-chat__clip,
+  .lh-chat__send { width: 40px; height: 40px; }
+  .lh-meet__card { padding: 14px; }
+  .lh-meet-people__list { max-height: 220px; }
 }

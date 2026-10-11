@@ -105,17 +105,6 @@ get_header();
                             </div>
                         </div>
 
-                        <div class="lh-accordion__item">
-                            <button class="lh-accordion__trigger" type="button" aria-expanded="false">
-                                <span class="lh-accordion__icon" aria-hidden="true">🎓</span>
-                                <span class="lh-accordion__title">Сертификаты</span>
-                                <span class="lh-accordion__toggle" aria-hidden="true">+</span>
-                            </button>
-                            <div class="lh-accordion__panel">
-                                <p>После завершения программы ученик получает электронный сертификат АЦО, если это указано на странице курса и выполнены условия аттестации.</p>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
                 <div>

@@ -65,6 +65,33 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
+     * Links to the public legal pages on www.acoedu.ru.
+     *
+     * @return string
+     */
+    public function learnhub_legal_nav() {
+        $items = [
+            'Документы' => 'https://www.acoedu.ru/legal/',
+            'Оферта' => 'https://www.acoedu.ru/oferta/',
+            'Конфиденциальность' => 'https://www.acoedu.ru/privacy/',
+            'Персональные данные' => 'https://www.acoedu.ru/personal-data/',
+            'Возврат' => 'https://www.acoedu.ru/refund/',
+        ];
+        $links = [];
+        foreach ($items as $label => $url) {
+            $links[] = \html_writer::link($url, $label);
+        }
+        return \html_writer::div(implode(' · ', $links), 'lh-moodle-legal');
+    }
+
+    /**
+     * @return string
+     */
+    public function standard_footer_html() {
+        return $this->learnhub_legal_nav() . parent::standard_footer_html();
+    }
+
+    /**
      * Used by the navbar Mustache as a section flag.
      *
      * @return bool
@@ -152,7 +179,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
-     * Shared footer on cabinet pages (panel, course, certificate).
+     * Shared footer on cabinet pages (panel, course, curator).
      *
      * @return string
      */
@@ -220,9 +247,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $pagetype = (string) $PAGE->pagetype;
 
         $onpanel = in_array($PAGE->pagelayout, ['mydashboard', 'mycourses'], true)
-            && strpos($path, '/theme/learnhub/certificate.php') === false
             && strpos($path, '/theme/learnhub/curator.php') === false;
-        $oncert = strpos($path, '/theme/learnhub/certificate.php') !== false;
         $oncurator = strpos($path, '/theme/learnhub/curator.php') !== false;
         $onquiz = strpos($pagetype, 'mod-quiz') === 0;
         $onlesson = (bool) preg_match('/^mod-(page|lesson|book|resource|url|h5pactivity)/', $pagetype);
@@ -235,12 +260,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
         if ($onlesson) {
             $oncourse = false;
         }
-        if ($oncert) {
-            $onpanel = false;
-            $oncourse = false;
-            $onquiz = false;
-            $onlesson = false;
-        }
         if ($oncurator) {
             $onpanel = false;
             $onquiz = false;
@@ -248,7 +267,30 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $oncourse = true;
         }
 
+        $onmeetings = strpos($path, '/theme/learnhub/meetings.php') !== false;
+        if (!$onmeetings && !empty($PAGE->cm) && $PAGE->cm->modname === 'bigbluebuttonbn') {
+            $live = (string) $PAGE->cm->idnumber === 'live-meeting' || (int) $PAGE->cm->sectionnum === 0;
+            if ($live) {
+                $onmeetings = true;
+            } else {
+                $oncourse = true;
+            }
+        }
+        if ($onmeetings) {
+            $onpanel = false;
+            $onquiz = false;
+            $onlesson = false;
+            $oncourse = false;
+        }
+
         $fallback = $CFG->wwwroot . '/my/';
+
+        $meetcount = 0;
+        $enrolled = enrol_get_all_users_courses($USER->id, true, 'id, fullname, shortname, visible');
+        if ($enrolled) {
+            $meetcount = \theme_learnhub\meetings::upcoming_count($enrolled, (int) $USER->id, true);
+        }
+        $meetlabel = $meetcount ? 'Онлайн-встречи (' . $meetcount . ')' : 'Онлайн-встречи';
 
         return [
             ['label' => 'Панель', 'url' => $CFG->wwwroot . '/my/', 'active' => $onpanel, 'disabled' => false],
@@ -259,10 +301,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 'disabled' => empty($targets['course']),
             ],
             [
-                'label' => 'Сертификат',
-                'url' => $targets['certificate'] ?: $fallback,
-                'active' => $oncert,
-                'disabled' => empty($targets['certificate']),
+                'label' => $meetlabel,
+                'url' => $CFG->wwwroot . '/theme/learnhub/meetings.php',
+                'active' => $onmeetings,
+                'disabled' => false,
             ],
         ];
     }
@@ -290,7 +332,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
-     * First quiz / lesson / certificate URLs for a course.
+     * First quiz / lesson URLs for a course.
      *
      * @param int $courseid
      * @return array
@@ -298,7 +340,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
     private function learnhub_course_targets($courseid) {
         global $CFG, $USER;
 
-        $out = ['course' => '', 'quiz' => '', 'lesson' => '', 'certificate' => '', 'curator' => ''];
+        $out = ['course' => '', 'quiz' => '', 'lesson' => '', 'curator' => ''];
         if (!$courseid) {
             return $out;
         }
@@ -322,7 +364,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
             // Leave quiz/lesson empty; course URL still works.
         }
 
-        $out['certificate'] = $CFG->wwwroot . '/theme/learnhub/certificate.php?id=' . $courseid;
         $out['curator'] = $CFG->wwwroot . '/theme/learnhub/curator.php?id=' . $courseid;
         return $out;
     }
@@ -333,7 +374,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return array
      */
     private function learnhub_teacher_nav_items() {
-        global $PAGE, $CFG;
+        global $PAGE, $CFG, $USER;
 
         $path = (string) parse_url($PAGE->url->out(false), PHP_URL_PATH);
         $courseid = optional_param('id', 0, PARAM_INT);
@@ -352,20 +393,28 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $onstudents = strpos($path, '/theme/learnhub/teacher/students.php') !== false;
         $onhw = strpos($path, '/theme/learnhub/teacher/homework.php') !== false;
         $oncurator = strpos($path, '/theme/learnhub/teacher/curator.php') !== false;
+        $onmeetings = strpos($path, '/theme/learnhub/teacher/meeting') !== false;
+        if (!$onmeetings && !empty($PAGE->cm) && $PAGE->cm->modname === 'bigbluebuttonbn') {
+            $onmeetings = true;
+        }
         $onpanel = strpos($path, '/theme/learnhub/teacher/index.php') !== false
-            || (!$onstudents && !$onhw && !$onaccount && !$oncurator);
+            || (!$onstudents && !$onhw && !$onaccount && !$oncurator && !$onmeetings);
 
         $studentsurl = $courseid ? $base . '/students.php?id=' . $courseid : $base . '/index.php';
         $hwurl = $courseid ? $base . '/homework.php?id=' . $courseid : $base . '/index.php';
         $curatorurl = $courseid ? $base . '/curator.php?id=' . $courseid : $base . '/index.php';
         $unread = $courseid ? \theme_learnhub\curator::unread_teacher_count($courseid) : 0;
         $curatorlabel = $unread ? 'Куратор (' . $unread . ')' : 'Куратор';
+        $meetcount = \theme_learnhub\meetings::upcoming_count(\theme_learnhub\roles::teacher_courses(), (int) $USER->id, false);
+        $meetcount += \theme_learnhub\meetings::staff_upcoming_count((int) $USER->id, true);
+        $meetlabel = $meetcount ? 'Встречи (' . $meetcount . ')' : 'Встречи';
 
         return [
             ['label' => 'Панель', 'url' => $base . '/index.php', 'active' => $onpanel, 'disabled' => false],
             ['label' => 'Студенты', 'url' => $studentsurl, 'active' => $onstudents, 'disabled' => !$courseid],
             ['label' => 'Домашки', 'url' => $hwurl, 'active' => $onhw, 'disabled' => !$courseid],
             ['label' => $curatorlabel, 'url' => $curatorurl, 'active' => $oncurator, 'disabled' => !$courseid],
+            ['label' => $meetlabel, 'url' => $base . '/meetings.php', 'active' => $onmeetings, 'disabled' => false],
         ];
     }
 
@@ -375,7 +424,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return array
      */
     private function learnhub_admin_nav_items() {
-        global $PAGE, $CFG;
+        global $PAGE, $CFG, $USER, $DB;
 
         $path = (string) parse_url($PAGE->url->out(false), PHP_URL_PATH);
         $courseid = 0;
@@ -384,6 +433,12 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
         if (!$courseid) {
             $courseid = optional_param('id', 0, PARAM_INT);
+        }
+        if ($courseid) {
+            $short = $DB->get_field('course', 'shortname', ['id' => $courseid]);
+            if ($short === \theme_learnhub\meetings::STAFF_COURSE) {
+                $courseid = 0;
+            }
         }
 
         $builder = $CFG->wwwroot . '/theme/learnhub/builder/index.php';
@@ -399,8 +454,15 @@ class core_renderer extends \theme_boost\output\core_renderer {
             ? $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $courseid
             : $builder;
 
+        $onmeetings = strpos($path, '/theme/learnhub/staff/meeting') !== false;
+        if (!$onmeetings && !empty($PAGE->cm) && $PAGE->cm->modname === 'bigbluebuttonbn') {
+            $onmeetings = (string) $PAGE->cm->idnumber === \theme_learnhub\meetings::STAFF;
+        }
+        $meetcount = \theme_learnhub\meetings::staff_upcoming_count((int) $USER->id, false);
+        $meetlabel = $meetcount ? 'Встречи (' . $meetcount . ')' : 'Встречи';
+
         return [
-            ['label' => 'Курсы', 'url' => $builder, 'active' => $onbuilder && !$onpreview, 'disabled' => false],
+            ['label' => 'Курсы', 'url' => $builder, 'active' => $onbuilder && !$onpreview && !$onmeetings, 'disabled' => false],
             [
                 'label' => 'Участники',
                 'url' => $usersurl,
@@ -412,6 +474,12 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 'url' => $gradesurl,
                 'active' => $ongrades,
                 'disabled' => !$courseid,
+            ],
+            [
+                'label' => $meetlabel,
+                'url' => $CFG->wwwroot . '/theme/learnhub/staff/meetings.php',
+                'active' => $onmeetings,
+                'disabled' => false,
             ],
             [
                 'label' => 'Moodle',

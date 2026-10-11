@@ -25,21 +25,11 @@ class format_aco extends format_topics {
             'default' => 1,
             'type' => PARAM_INT,
         ];
-        $options['aco_certificate'] = [
-            'default' => 1,
-            'type' => PARAM_INT,
-        ];
 
         if ($foreditform) {
             $options['aco_sequential'] += [
                 'label' => get_string('sequential', 'format_aco'),
                 'help' => 'sequential',
-                'help_component' => 'format_aco',
-                'element_type' => 'selectyesno',
-            ];
-            $options['aco_certificate'] += [
-                'label' => get_string('certificate', 'format_aco'),
-                'help' => 'certificate',
                 'help_component' => 'format_aco',
                 'element_type' => 'selectyesno',
             ];

@@ -102,6 +102,12 @@ $needs_payment = $order->needs_payment();
 				<div class="form-row place-order">
 					<input type="hidden" name="woocommerce_pay" value="1" />
 					<?php wc_get_template( 'checkout/terms.php' ); ?>
+					<p class="aco-checkout-accept">
+						<label class="aco-checkbox">
+							<input type="checkbox" name="aco_oferta_accept" value="1" required>
+							<span>Я принимаю <a href="<?php echo esc_url( aco_legal_url( 'oferta' ) ); ?>" target="_blank" rel="noopener">публичную оферту</a> редакции от <?php echo esc_html( aco_legal_context()['updated'] ); ?></span>
+						</label>
+					</p>
 					<?php do_action( 'woocommerce_pay_order_before_submit' ); ?>
 					<?php
 					echo apply_filters(

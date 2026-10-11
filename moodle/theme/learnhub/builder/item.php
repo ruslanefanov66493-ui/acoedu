@@ -18,7 +18,7 @@ $course = theme_learnhub_builder_ensure_aco($course);
 $modinfo = get_fast_modinfo($course);
 $section = $modinfo->get_section_info($sectionnum);
 
-$allowed = ['video', 'page', 'summary', 'quiz', 'assign'];
+$allowed = ['video', 'page', 'summary', 'quiz', 'assign', 'meeting'];
 if (!in_array($type, $allowed, true)) {
     throw new moodle_exception('invalidparameter');
 }
@@ -37,6 +37,7 @@ $titles = [
     'summary' => 'Самопроверка',
     'quiz' => 'Тест',
     'assign' => 'Домашка учителю',
+    'meeting' => 'Онлайн-встреча',
 ];
 
 $back = new moodle_url('/theme/learnhub/builder/index.php', ['id' => $course->id, 'section' => $sectionnum]);
@@ -100,6 +101,21 @@ if (data_submitted() && confirm_sesskey()) {
                 } else {
                     theme_learnhub_builder_add_assign($course, $sectionnum, $name, $introhtml, $idnumber, $format, $maxfiles, $filetypes);
                 }
+            } else if ($type === 'meeting') {
+                $intro = trim(optional_param('intro', '', PARAM_TEXT));
+                $introhtml = theme_learnhub_builder_notes_html($intro);
+                if ($introhtml === '') {
+                    $introhtml = '<p>Вход только из аккаунта ученика этого курса. Ссылку переслать нельзя.</p>';
+                }
+                $opens = trim(optional_param('opens', '', PARAM_TEXT));
+                $closes = trim(optional_param('closes', '', PARAM_TEXT));
+                $openingtime = $opens !== '' ? (int) strtotime($opens) : 0;
+                $closingtime = $closes !== '' ? (int) strtotime($closes) : 0;
+                if ($cm) {
+                    theme_learnhub_builder_update_meeting($course, $cm, $name, $introhtml, $openingtime, $closingtime);
+                } else {
+                    theme_learnhub_builder_add_meeting($course, $sectionnum, $name, $introhtml, $openingtime, $closingtime);
+                }
             } else if ($type === 'quiz') {
                 $intro = trim(optional_param('intro', '', PARAM_TEXT));
                 $introhtml = $intro !== '' ? '<p>' . s($intro) . '</p>' : '';
@@ -144,6 +160,8 @@ $prefill = [
     'filetypes' => '',
     'isfinal' => 0,
     'slots' => [],
+    'opens' => '',
+    'closes' => '',
 ];
 
 if ($cm) {
@@ -169,6 +187,17 @@ if ($cm) {
         $prefill['maxfiles'] = $st['maxfiles'] ?: 3;
         $prefill['filetypes'] = $st['filetypes'];
         $prefill['isfinal'] = in_array(strtolower((string) $cm->idnumber), ['final', 'project'], true) ? 1 : 0;
+    } else if ($cm->modname === 'bigbluebuttonbn') {
+        global $DB;
+        $room = $DB->get_record('bigbluebuttonbn', ['id' => $cm->instance]);
+        $prefill['name'] = $room->name ?? $cm->name;
+        $prefill['intro'] = html_to_text($room->intro ?? '', 0, false);
+        if (!empty($room->openingtime)) {
+            $prefill['opens'] = date('Y-m-d\TH:i', (int) $room->openingtime);
+        }
+        if (!empty($room->closingtime)) {
+            $prefill['closes'] = date('Y-m-d\TH:i', (int) $room->closingtime);
+        }
     } else if ($cm->modname === 'quiz') {
         global $DB;
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
@@ -304,6 +333,34 @@ if ($type === 'assign') {
     }
     echo html_writer::empty_tag('input', $cb);
     echo html_writer::span('Это финальная работа курса');
+    echo html_writer::end_tag('label');
+}
+
+if ($type === 'meeting') {
+    echo html_writer::tag('p', 'Ученик входит из программы курса. Гостевой ссылки нет: переслать вход другому человеку нельзя. Комнаты потоков разделяются группами Moodle.', ['class' => 'lh-build__hint']);
+    echo html_writer::start_tag('label');
+    echo html_writer::tag('span', 'Начало');
+    echo html_writer::empty_tag('input', [
+        'type' => 'datetime-local',
+        'name' => 'opens',
+        'value' => $prefill['opens'],
+    ]);
+    echo html_writer::end_tag('label');
+    echo html_writer::start_tag('label');
+    echo html_writer::tag('span', 'Конец (необязательно)');
+    echo html_writer::empty_tag('input', [
+        'type' => 'datetime-local',
+        'name' => 'closes',
+        'value' => $prefill['closes'],
+    ]);
+    echo html_writer::end_tag('label');
+    echo html_writer::start_tag('label');
+    echo html_writer::tag('span', 'Что сказать студенту');
+    echo html_writer::tag('textarea', s($prefill['intro']), [
+        'name' => 'intro',
+        'rows' => 4,
+        'placeholder' => 'Например: встреча потока в четверг, камера по желанию.',
+    ]);
     echo html_writer::end_tag('label');
 }
 

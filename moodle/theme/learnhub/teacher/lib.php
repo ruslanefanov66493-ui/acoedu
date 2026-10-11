@@ -118,6 +118,74 @@ function theme_learnhub_hw_badge(array $state) {
 }
 
 /**
+ * Short name for a student. Enrolment often stores the mailbox as the Moodle name.
+ *
+ * @param \stdClass $user
+ * @return array{name:string,email:string}
+ */
+function theme_learnhub_student_label($user) {
+    $first = trim((string) ($user->firstname ?? ''));
+    $last = trim((string) ($user->lastname ?? ''));
+    $email = trim((string) ($user->email ?? ''));
+    if (in_array($last, ['', '-', '—', '–', '.'], true)) {
+        $last = '';
+    }
+    if ($first !== '' && ($last === $first || ($last !== '' && strpos($last, $first . '_') === 0))) {
+        $last = '';
+    }
+    $name = trim($first . ' ' . $last);
+    if ($name !== '' && strpos($name, '_') !== false && strpos($name, ' ') === false) {
+        $stripped = preg_replace('/_[A-Za-z0-9]+$/u', '', $name);
+        if (is_string($stripped) && $stripped !== '') {
+            $name = $stripped;
+        }
+    }
+    if ($name === '' || strpos($name, '@') !== false) {
+        $local = strstr($email, '@', true);
+        $name = ($local !== false && $local !== '') ? $local : ($email !== '' ? $email : 'Студент');
+    }
+    return ['name' => $name, 'email' => $email];
+}
+
+/**
+ * Name and email for an invite row. Long addresses wrap instead of being clipped.
+ *
+ * @param \stdClass $user
+ * @return string
+ */
+function theme_learnhub_invite_person($user) {
+    $label = theme_learnhub_student_label($user);
+    return html_writer::tag('span',
+        html_writer::span(s($label['name']), 'lh-meet-person__name') .
+        html_writer::tag('small', s($label['email'])),
+        ['class' => 'lh-meet-person']
+    );
+}
+
+/**
+ * @param int $n
+ * @param string $one
+ * @param string $few
+ * @param string $many
+ * @return string
+ */
+function theme_learnhub_ru_n($n, $one, $few, $many) {
+    $n = (int) $n;
+    $abs = abs($n) % 100;
+    $n1 = $abs % 10;
+    if ($abs > 10 && $abs < 20) {
+        $word = $many;
+    } else if ($n1 === 1) {
+        $word = $one;
+    } else if ($n1 >= 2 && $n1 <= 4) {
+        $word = $few;
+    } else {
+        $word = $many;
+    }
+    return $n . ' ' . $word;
+}
+
+/**
  * Course switcher used on students/homework screens.
  *
  * @param \stdClass[] $courses
@@ -182,7 +250,7 @@ function theme_learnhub_teacher_overview(array $courses) {
                 $stats['pending']++;
                 if (count($queue) < 12) {
                     $queue[] = [
-                        'student' => fullname($student),
+                        'student' => theme_learnhub_student_label($student)['name'],
                         'course' => format_string($course->fullname),
                         'task' => $cm->get_formatted_name(),
                         'url' => new moodle_url('/theme/learnhub/teacher/homework.php', [

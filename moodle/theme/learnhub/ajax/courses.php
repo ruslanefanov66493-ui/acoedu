@@ -44,7 +44,7 @@ $courses = enrol_get_all_users_courses($USER->id, true, 'id, fullname, summary, 
 $result = [];
 
 foreach ($courses as $course) {
-    if ((int) $course->id === (int) SITEID || empty($course->visible)) {
+    if ((int) $course->id === (int) SITEID || empty($course->visible) || (string) $course->shortname === 'lh-staff') {
         continue;
     }
 
@@ -124,7 +124,6 @@ foreach ($courses as $course) {
         'url'           => $continueurl,
         'programurl'    => (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false),
         'continueurl'   => $continueurl,
-        'certificate'   => (new \moodle_url('/theme/learnhub/certificate.php', ['id' => $course->id]))->out(false),
         'curatorurl'    => (new \moodle_url('/theme/learnhub/curator.php', ['id' => $course->id]))->out(false),
     ];
 }

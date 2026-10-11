@@ -37,6 +37,13 @@ if ( ! wp_doing_ajax() ) {
 
 		<?php wc_get_template( 'checkout/terms.php' ); ?>
 
+		<p class="aco-checkout-accept">
+			<label class="aco-checkbox">
+				<input type="checkbox" name="aco_oferta_accept" value="1" required>
+				<span>Я принимаю <a href="<?php echo esc_url( aco_legal_url( 'oferta' ) ); ?>" target="_blank" rel="noopener">публичную оферту</a> редакции от <?php echo esc_html( aco_legal_context()['updated'] ); ?></span>
+			</label>
+		</p>
+
 		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
 
 		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt lh-btn lh-btn--primary aco-checkout-pay' . esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ) . '" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $order_button_text ) . '" data-value="' . esc_attr( $order_button_text ) . '">' . esc_html( $order_button_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

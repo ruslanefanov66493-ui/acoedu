@@ -29,7 +29,6 @@ get_header();
                 <a class="md-sidebar__item" href="#">Страница курса</a>
                 <a class="md-sidebar__item" href="#">Страница теста</a>
                 <a class="md-sidebar__item" href="#">Урок</a>
-                <a class="md-sidebar__item" href="#">Сертификат</a>
             </aside>
 
             <div class="md-content">
@@ -67,7 +66,7 @@ get_header();
                             <span class="md-course-card__percent">100%</span>
                         </div>
 
-                        <a class="md-course-card__btn md-course-card__btn--success" href="#">Скачать сертификат</a>
+                        <a class="md-course-card__btn md-course-card__btn--success" href="#">Курс пройден — открыть</a>
                     </article>
                 </div>
             </div>

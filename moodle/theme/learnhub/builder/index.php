@@ -252,6 +252,7 @@ if ($course) {
         echo html_writer::link(new moodle_url($addbase, ['type' => 'summary']), '+ Самопроверка', ['class' => 'lh-build__chip']);
         echo html_writer::link(new moodle_url($addbase, ['type' => 'quiz']), '+ Тест', ['class' => 'lh-build__chip']);
         echo html_writer::link(new moodle_url($addbase, ['type' => 'assign']), '+ Домашка', ['class' => 'lh-build__chip']);
+        echo html_writer::link(new moodle_url($addbase, ['type' => 'meeting']), '+ Онлайн-встреча', ['class' => 'lh-build__chip']);
         echo html_writer::end_div();
 
         if (!$current['items']) {
@@ -287,6 +288,8 @@ if ($course) {
                     $edittype = 'assign';
                 } else if ($kind === 'test') {
                     $edittype = 'quiz';
+                } else if ($kind === 'meeting') {
+                    $edittype = 'meeting';
                 }
                 echo html_writer::link(
                     new moodle_url('/theme/learnhub/builder/item.php', [
@@ -349,7 +352,7 @@ echo html_writer::end_tag('form');
 
 echo html_writer::start_div('lh-build__grid');
 foreach ($courses as $c) {
-    if ((int) $c->id === (int) SITEID) {
+    if ((int) $c->id === (int) SITEID || (string) $c->shortname === 'lh-staff') {
         continue;
     }
     $stats = theme_learnhub_builder_course_stats($c);

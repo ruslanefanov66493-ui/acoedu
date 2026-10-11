@@ -147,7 +147,7 @@ if ($cmid && $userid) {
     echo html_writer::start_div('lh-hw__who');
     echo $OUTPUT->user_picture($student, ['size' => 56, 'link' => false, 'class' => 'lh-hw__avatar']);
     echo html_writer::start_div('lh-hw__who-txt');
-    echo html_writer::tag('strong', s(fullname($student)));
+    echo html_writer::tag('strong', s(theme_learnhub_student_label($student)['name']));
     echo html_writer::tag('span', $when !== '' ? 'Отправлено ' . $when : 'Работа ещё не отправлена');
     echo html_writer::end_div();
     echo theme_learnhub_hw_badge($state);
@@ -302,7 +302,7 @@ if (!$visible) {
         echo html_writer::start_tag('a', ['class' => 'lh-hw__card', 'href' => $open->out(false)]);
         echo $OUTPUT->user_picture($entry['student'], ['size' => 48, 'link' => false, 'class' => 'lh-hw__avatar']);
         echo html_writer::start_div('lh-hw__card-txt');
-        echo html_writer::tag('strong', s(fullname($entry['student'])));
+        echo html_writer::tag('strong', s(theme_learnhub_student_label($entry['student'])['name']));
         echo html_writer::tag('span', $entry['task']);
         if ($when !== '') {
             echo html_writer::tag('em', $when);

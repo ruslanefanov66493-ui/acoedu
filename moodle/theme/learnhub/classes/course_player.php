@@ -137,6 +137,19 @@ class course_player {
      */
     public function render_toolbar(): string {
         global $OUTPUT;
+
+        if ($this->is_live_meeting()) {
+            $list = \theme_learnhub\roles::kind() === 'teacher'
+                ? new moodle_url('/theme/learnhub/teacher/meetings.php')
+                : new moodle_url('/theme/learnhub/meetings.php');
+            $html = html_writer::tag(
+                'nav',
+                html_writer::link($list, 'Онлайн-встречи') . ' › ' . $this->currentcm->get_formatted_name(),
+                ['class' => 'lh-crumb']
+            );
+            $html .= html_writer::tag('h1', $this->currentcm->get_formatted_name(), ['class' => 'lh-meet__join-title']);
+            return $html;
+        }
         return $OUTPUT->render_from_template('theme_learnhub/courseplayer_toolbar', $this->data());
     }
 
@@ -145,7 +158,23 @@ class course_player {
      */
     public function render_pager(): string {
         global $OUTPUT;
+
+        if ($this->is_live_meeting()) {
+            return '';
+        }
         return $OUTPUT->render_from_template('theme_learnhub/courseplayer_pager', $this->data());
+    }
+
+    /**
+     * Cabinet meetings live in section 0 and are not programme lessons.
+     *
+     * @return bool
+     */
+    private function is_live_meeting(): bool {
+        if (!$this->currentcm || $this->currentcm->modname !== 'bigbluebuttonbn') {
+            return false;
+        }
+        return (string) $this->currentcm->idnumber === meetings::LIVE || (int) $this->currentcm->sectionnum === 0;
     }
 
     /**
@@ -354,11 +383,6 @@ class course_player {
         $data->finalwork = $this->export_special('final');
         $data->hasfinaltest = !empty($data->finaltest);
         $data->hasfinalwork = !empty($data->finalwork);
-        $data->certificateurl = (new moodle_url('/theme/learnhub/certificate.php', ['id' => $this->course->id]))->out(false);
-        $data->certificate_ready = ($percent >= 100);
-        $data->certificate_hint = $data->certificate_ready
-            ? 'Можно скачать сертификат'
-            : 'Сертификат откроется после выполнения программы курса';
         $data->continueurl = $this->continue_url();
         $data->continuelabel = $counts['done'] ? 'Продолжить обучение' : 'Начать обучение';
         $data->curatorurl = (new moodle_url('/theme/learnhub/curator.php', ['id' => $this->course->id]))->out(false);
@@ -536,6 +560,9 @@ class course_player {
         if ($id === 'page' || $id === 'lesson') {
             return 'page';
         }
+        if ($id === 'meeting' || strpos($id, 'meeting') === 0 || $cm->modname === 'bigbluebuttonbn') {
+            return 'meeting';
+        }
 
         $name = core_text_lower($cm->name);
         if ($cm->modname === 'assign') {
@@ -578,6 +605,7 @@ class course_player {
             'link' => 'Внешняя ссылка',
             'finaltest' => 'Итоговое тестирование',
             'final' => 'Финальная работа',
+            'meeting' => 'Онлайн-встреча',
         ];
         return $map[$type] ?? 'Материал';
     }
@@ -928,7 +956,7 @@ class course_player {
                         format_string($this->course->fullname) . '»';
                     $row['blurb'] = $item['locked']
                         ? ($item['lockreason'] ?: 'Финальная работа откроется после завершения последнего модуля')
-                        : 'Сдайте проект, чтобы завершить курс и получить сертификат.';
+                        : 'Сдайте проект, чтобы завершить курс.';
                 } else {
                     $row['blocktitle'] = 'Итоговое тестирование';
                     $row['blurb'] = $item['locked']

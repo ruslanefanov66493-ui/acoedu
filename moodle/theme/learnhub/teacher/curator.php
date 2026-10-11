@@ -10,11 +10,18 @@ require_once(__DIR__ . '/lib.php');
 
 $courseid = required_param('id', PARAM_INT);
 $threadid = optional_param('thread', 0, PARAM_INT);
+$studentid = optional_param('student', 0, PARAM_INT);
 $course = theme_learnhub_require_teacher_course($courseid);
 $allcourses = \theme_learnhub\roles::teacher_courses();
 $ctx = context_course::instance($course->id);
 
-$PAGE->set_url(new moodle_url('/theme/learnhub/teacher/curator.php', ['id' => $courseid, 'thread' => $threadid]));
+$pageparams = ['id' => $courseid];
+if ($threadid) {
+    $pageparams['thread'] = $threadid;
+} else if ($studentid) {
+    $pageparams['student'] = $studentid;
+}
+$PAGE->set_url(new moodle_url('/theme/learnhub/teacher/curator.php', $pageparams));
 $PAGE->set_context($ctx);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title('Вопросы куратору');
@@ -33,13 +40,45 @@ if ($threadid) {
     }
 }
 
-if ($thread && data_submitted() && confirm_sesskey()) {
-    $reply = trim(optional_param('reply', '', PARAM_TEXT));
-    if ($reply === '') {
-        $error = 'Напишите ответ.';
+$compose = null;
+if (!$thread && $studentid) {
+    foreach (theme_learnhub_course_students($course) as $enrolled) {
+        if ((int) $enrolled->id === $studentid) {
+            $compose = $enrolled;
+            break;
+        }
+    }
+    if (!$compose) {
+        throw new moodle_exception('invaliduser');
+    }
+    $existing = \theme_learnhub\curator::get_thread($courseid, $studentid);
+    if ($existing && trim((string) $existing->lastmessage) !== '') {
+        redirect(new moodle_url('/theme/learnhub/teacher/curator.php', [
+            'id' => $courseid,
+            'thread' => $existing->id,
+        ]));
+    }
+    if ($existing) {
+        $thread = $existing;
+    }
+}
+
+if (($thread || $compose) && data_submitted() && confirm_sesskey()) {
+    $reply = trim(optional_param('message', '', PARAM_TEXT));
+    $taken = \theme_learnhub\curator::take_uploads();
+    if ($taken['error'] !== '') {
+        $error = $taken['error'];
+    } else if ($reply === '' && !$taken['files']) {
+        $error = 'Напишите сообщение или прикрепите файл.';
     } else {
-        \theme_learnhub\curator::add_message($thread, (int) $USER->id, $reply, true);
-        redirect(new moodle_url('/theme/learnhub/teacher/curator.php', ['id' => $courseid, 'thread' => $thread->id]));
+        if (!$thread) {
+            $thread = \theme_learnhub\curator::get_or_create_thread($courseid, (int) $compose->id);
+        }
+        \theme_learnhub\curator::post($thread, (int) $USER->id, $reply, true, $taken['files'], $ctx->id);
+        redirect(new moodle_url('/theme/learnhub/teacher/curator.php', [
+            'id' => $courseid,
+            'thread' => $thread->id,
+        ]));
     }
 }
 
@@ -47,109 +86,122 @@ if ($thread) {
     \theme_learnhub\curator::mark_read($thread, true);
     $messages = \theme_learnhub\curator::messages((int) $thread->id);
     $student = core_user::get_user($thread->userid, '*', MUST_EXIST);
+} else if ($compose) {
+    $messages = [];
+    $student = $compose;
 } else {
     $messages = [];
     $student = null;
 }
 
 $threads = \theme_learnhub\curator::course_threads($courseid);
+$users = [];
+if ($threads) {
+    $users = $DB->get_records_list('user', 'id', array_map(function ($row) {
+        return (int) $row->userid;
+    }, $threads));
+}
 
 echo $OUTPUT->header();
 echo html_writer::start_div('lh-teach lh-curator-admin');
 echo html_writer::tag(
     'nav',
-    html_writer::link(new moodle_url('/theme/learnhub/teacher/index.php'), 'Панель') . ' › ' . s($coursename),
+    html_writer::link(new moodle_url('/theme/learnhub/teacher/index.php'), 'Панель') . ' › ' . $coursename,
     ['class' => 'lh-crumb']
 );
 echo html_writer::tag('h1', 'Вопросы куратору');
 echo theme_learnhub_teacher_course_switcher($allcourses, $courseid, 'curator');
-echo html_writer::tag('p', 'Студенты пишут со вкладки «Куратор» в своём курсе. Ответ появится у них в той же переписке.', ['class' => 'lh-teach__lead']);
 
-if ($error) {
-    echo html_writer::div(s($error), 'lh-account-page__error');
+if (!$threads && !$student) {
+    echo html_writer::div(
+        'Пока никто не писал. Откройте студента во вкладке «Студенты» и нажмите «Написать», либо дождитесь его сообщения.',
+        'lh-teach__empty'
+    );
+    echo html_writer::end_div();
+    echo $OUTPUT->footer();
+    exit;
 }
 
-if ($thread && $student) {
-    echo html_writer::tag(
-        'p',
-        html_writer::link(
-            new moodle_url('/theme/learnhub/teacher/curator.php', ['id' => $courseid]),
-            '← Все вопросы'
-        ),
-        ['class' => 'lh-teach__inline']
-    );
-    echo html_writer::tag('h2', 'Переписка: ' . fullname($student), ['class' => 'lh-teach__h2']);
-    echo html_writer::start_div('lh-curator__chat');
-    if (!$messages) {
-        echo html_writer::div('Сообщений пока нет.', 'lh-curator__empty');
-    } else {
-        foreach ($messages as $msg) {
-            $fromteacher = !empty($msg->isteacher);
-            $who = $fromteacher ? 'Вы' : fullname($student);
-            $class = 'lh-curator__bubble' . ($fromteacher ? ' is-mine' : ' is-curator');
-            echo html_writer::start_div($class);
-            echo html_writer::tag('span', s($who) . ' · ' . userdate($msg->timecreated, '%d.%m %H:%M'), ['class' => 'lh-curator__meta']);
-            echo html_writer::tag('p', nl2br(s($msg->message)));
-            echo html_writer::end_div();
-        }
+$boxclass = 'lh-chatbox' . ($student ? ' is-thread' : '');
+echo html_writer::start_div($boxclass);
+echo html_writer::start_tag('aside', ['class' => 'lh-chat__list', 'aria-label' => 'Переписки']);
+echo html_writer::tag('div', 'Переписки', ['class' => 'lh-chat__list-title']);
+if ($compose && !$thread) {
+    $clabel = theme_learnhub_student_label($compose);
+    $body = html_writer::span(\theme_learnhub\curator::initials($clabel['name']), 'lh-chat__avatar');
+    $body .= html_writer::start_span('lh-chat__row-main');
+    $body .= html_writer::start_span('lh-chat__row-top');
+    $body .= html_writer::tag('b', s($clabel['name']));
+    $body .= html_writer::tag('time', 'сейчас');
+    $body .= html_writer::end_span();
+    $body .= html_writer::tag('span', 'Новое сообщение', ['class' => 'lh-chat__row-preview']);
+    $body .= html_writer::end_span();
+    echo html_writer::link($PAGE->url, $body, ['class' => 'lh-chat__row is-active']);
+}
+foreach ($threads as $row) {
+    $user = $users[$row->userid] ?? null;
+    $name = $user ? theme_learnhub_student_label($user)['name'] : 'Студент';
+    $open = new moodle_url('/theme/learnhub/teacher/curator.php', [
+        'id' => $courseid,
+        'thread' => $row->id,
+    ]);
+    $rowclass = 'lh-chat__row';
+    if ($thread && (int) $thread->id === (int) $row->id) {
+        $rowclass .= ' is-active';
     }
-    echo html_writer::end_div();
+    if ((int) $row->unreadteacher === 1) {
+        $rowclass .= ' is-unread';
+    }
+    $body = html_writer::span(\theme_learnhub\curator::initials($name), 'lh-chat__avatar');
+    $body .= html_writer::start_span('lh-chat__row-main');
+    $body .= html_writer::start_span('lh-chat__row-top');
+    $body .= html_writer::tag('b', s($name));
+    $body .= html_writer::tag('time', \theme_learnhub\curator::short_when((int) $row->timemodified));
+    $body .= html_writer::end_span();
+    $body .= html_writer::tag('span', s($row->lastmessage ?: 'Сообщение'), ['class' => 'lh-chat__row-preview']);
+    $body .= html_writer::end_span();
+    if ((int) $row->unreadteacher === 1) {
+        $body .= html_writer::span('1', 'lh-chat__badge');
+    }
+    echo html_writer::link($open, $body, ['class' => $rowclass]);
+}
+echo html_writer::end_tag('aside');
 
-    echo html_writer::start_tag('form', [
-        'method' => 'post',
-        'class' => 'lh-curator__form',
-        'action' => (new moodle_url('/theme/learnhub/teacher/curator.php', [
+echo html_writer::start_tag('section', ['class' => 'lh-chat__pane', 'aria-label' => 'Диалог']);
+if ($student) {
+    $slabel = theme_learnhub_student_label($student);
+    $back = new moodle_url('/theme/learnhub/teacher/curator.php', ['id' => $courseid]);
+    echo html_writer::start_div('lh-chat__head');
+    echo html_writer::link($back, '←', ['class' => 'lh-chat__back', 'aria-label' => 'Все переписки']);
+    echo html_writer::span(\theme_learnhub\curator::initials($slabel['name']), 'lh-chat__avatar');
+    echo html_writer::start_div('lh-chat__who');
+    echo html_writer::tag('strong', s($slabel['name']));
+    echo html_writer::tag('span', 'Студент · ' . $coursename);
+    echo html_writer::end_div();
+    echo html_writer::end_div();
+    $action = $thread
+        ? new moodle_url('/theme/learnhub/teacher/curator.php', [
             'id' => $courseid,
             'thread' => $thread->id,
-        ]))->out(false),
-    ]);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
-    echo html_writer::tag('textarea', s($reply), [
-        'name' => 'reply',
-        'rows' => 4,
-        'required' => 'required',
-        'maxlength' => (string) \theme_learnhub\curator::MAXLEN,
-        'placeholder' => 'Ответ студенту',
-    ]);
-    echo html_writer::tag('button', 'Ответить', ['type' => 'submit', 'class' => 'lh-course-card__btn lh-course-card__btn--primary']);
-    echo html_writer::end_tag('form');
-    echo html_writer::script("document.querySelector('.lh-curator__chat')&&(document.querySelector('.lh-curator__chat').scrollTop=document.querySelector('.lh-curator__chat').scrollHeight);");
+        ])
+        : new moodle_url('/theme/learnhub/teacher/curator.php', [
+            'id' => $courseid,
+            'student' => $student->id,
+        ]);
+    echo \theme_learnhub\curator::render_dialog(
+        $courseid,
+        $messages,
+        true,
+        $action,
+        $reply,
+        $thread ? 'Напишите ответ…' : 'Напишите сообщение…',
+        $error
+    );
 } else {
-    if (!$threads) {
-        echo html_writer::div('Пока никто не писал. Когда студент задаст вопрос, он появится здесь.', 'lh-teach__empty');
-    } else {
-        echo html_writer::start_div('lh-teach__tablewrap');
-        echo html_writer::start_tag('table', ['class' => 'lh-teach__table']);
-        echo html_writer::tag('thead', html_writer::tag('tr',
-            html_writer::tag('th', 'Студент') .
-            html_writer::tag('th', 'Последнее сообщение') .
-            html_writer::tag('th', 'Статус') .
-            html_writer::tag('th', '')
-        ));
-        echo html_writer::start_tag('tbody');
-        foreach ($threads as $row) {
-            $u = core_user::get_user($row->userid);
-            $name = $u ? fullname($u) : 'Студент #' . $row->userid;
-            $status = ((int) $row->unreadteacher === 1)
-                ? html_writer::span('Ждёт ответа', 'lh-teach__badge lh-teach__badge--wait')
-                : html_writer::span('Отвечено', 'lh-teach__badge lh-teach__badge--ok');
-            $open = new moodle_url('/theme/learnhub/teacher/curator.php', [
-                'id' => $courseid,
-                'thread' => $row->id,
-            ]);
-            echo html_writer::tag('tr',
-                html_writer::tag('td', s($name)) .
-                html_writer::tag('td', s($row->lastmessage ?: '—') . '<br><span class="lh-curator__time">' .
-                    userdate($row->timemodified, '%d.%m.%Y %H:%M') . '</span>') .
-                html_writer::tag('td', $status) .
-                html_writer::tag('td', html_writer::link($open, 'Открыть', ['class' => 'lh-teach__link']))
-            );
-        }
-        echo html_writer::end_tag('tbody');
-        echo html_writer::end_tag('table');
-        echo html_writer::end_div();
-    }
+    echo html_writer::div('Выберите переписку слева.', 'lh-chat__placeholder');
 }
+echo html_writer::end_tag('section');
+echo html_writer::end_div();
 
 echo html_writer::end_div();
 echo $OUTPUT->footer();

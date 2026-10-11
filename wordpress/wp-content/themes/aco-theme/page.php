@@ -56,8 +56,8 @@ $slug = get_post_field( 'post_name', get_the_ID() );
                         <div class="lh-value-item">
                             <span class="lh-value-icon">🎓</span>
                             <div class="lh-value-text">
-                                <p class="lh-value-title">Сертификаты</p>
-                                <p class="lh-value-desc">Документы для портфолио</p>
+                                <p class="lh-value-title">Проверка работ</p>
+                                <p class="lh-value-desc">Домашние задания смотрит преподаватель</p>
                             </div>
                         </div>
                     </div>

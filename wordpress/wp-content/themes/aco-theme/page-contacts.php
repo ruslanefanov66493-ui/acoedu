@@ -54,14 +54,10 @@ get_header();
 
                         <button class="lh-btn lh-btn--contact" type="submit">Отправить сообщение</button>
                     </form>
-
-                    <div class="lh-contacts-details">
-                        <?php aco_the_public_contacts( 'details' ); ?>
-                        <?php aco_the_legal_requisites(); ?>
-                    </div>
                 </div>
 
             </div>
+            <?php aco_the_legal_requisites(); ?>
         </div>
     </section>
 

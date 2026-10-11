@@ -96,3 +96,49 @@ function theme_learnhub_page_init($page) {
         redirect(new moodle_url('/theme/learnhub/builder/index.php', ['id' => $page->course->id]));
     }
 }
+
+/**
+ * Serve a file from a curator conversation.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool
+ */
+function theme_learnhub_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    global $USER;
+
+    if ($context->contextlevel !== CONTEXT_COURSE || $filearea !== \theme_learnhub\curator::FILEAREA) {
+        return false;
+    }
+
+    require_login($course, false);
+    if (isguestuser()) {
+        return false;
+    }
+
+    $itemid = (int) array_shift($args);
+    $filename = array_pop($args);
+    if (!$itemid || !is_string($filename) || $filename === '') {
+        return false;
+    }
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+    if ($filepath !== '/') {
+        return false;
+    }
+    if (!\theme_learnhub\curator::user_can_see_file((int) $course->id, $itemid, (int) $USER->id)) {
+        return false;
+    }
+
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, \theme_learnhub\curator::COMPONENT, $filearea, $itemid, '/', $filename);
+    if (!$file || $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload, $options);
+}

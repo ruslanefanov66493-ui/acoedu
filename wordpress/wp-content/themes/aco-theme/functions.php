@@ -15,6 +15,7 @@ require_once get_template_directory() . '/inc/course-content.php';
 require_once get_template_directory() . '/inc/teachers.php';
 require_once get_template_directory() . '/inc/admin-panel.php';
 require_once get_template_directory() . '/inc/mail.php';
+require_once get_template_directory() . '/inc/phone-auth.php';
 
 /* ── Setup ──────────────────────────────────────────────────────────── */
 function aco_setup() {
@@ -39,6 +40,45 @@ add_action( 'after_setup_theme', 'aco_setup' );
 
 /* ── Hide WP admin bar on the frontend for everyone ─────────────────── */
 add_filter( 'show_admin_bar', '__return_false' );
+
+add_filter( 'xmlrpc_enabled', '__return_false' );
+
+add_filter( 'wp_sitemaps_enabled', '__return_true' );
+
+add_filter( 'rest_endpoints', function( $endpoints ) {
+    if ( is_user_logged_in() ) {
+        return $endpoints;
+    }
+    unset( $endpoints['/wp/v2/users'] );
+    unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+    return $endpoints;
+} );
+
+add_filter( 'robots_txt', function( $output ) {
+    $lines = [
+        'Disallow: /checkout/',
+        'Disallow: /account/',
+        'Disallow: /login/',
+        'Disallow: /cart/',
+        'Disallow: /author/',
+        'Disallow: /wp-json/wp/v2/users',
+        'Sitemap: ' . home_url( '/wp-sitemap.xml' ),
+    ];
+    return rtrim( $output ) . "\n" . implode( "\n", $lines ) . "\n";
+}, 20 );
+
+add_action( 'template_redirect', function() {
+    if ( is_author() ) {
+        wp_safe_redirect( home_url( '/' ), 301 );
+        exit;
+    }
+
+    $path = rawurldecode( (string) ( $_SERVER['REQUEST_URI'] ?? '' ) );
+    if ( str_contains( $path, 'backend-разработка' ) ) {
+        wp_safe_redirect( home_url( '/product/backend-course/' ), 301 );
+        exit;
+    }
+}, 0 );
 
 /* ── Favicon: circular ACO mark (book in a ring), Google-style ──────── */
 function aco_favicon_url( $size = 32 ) {
@@ -231,6 +271,13 @@ function aco_assets() {
             get_template_directory_uri() . '/assets/account-dashboard.js',
             [],
             wp_get_theme()->get( 'Version' ) . '.' . filemtime( get_stylesheet_directory() . '/assets/account-dashboard.js' ),
+            true
+        );
+        wp_enqueue_script(
+            'aco-account-profile',
+            get_template_directory_uri() . '/assets/account-profile.js',
+            [],
+            wp_get_theme()->get( 'Version' ) . '.' . filemtime( get_stylesheet_directory() . '/assets/account-profile.js' ),
             true
         );
     }
@@ -923,10 +970,40 @@ add_filter( 'woocommerce_pay_order_button_text', function() {
     return 'Перейти к оплате';
 } );
 
+add_action( 'woocommerce_checkout_process', 'aco_require_oferta_accept' );
+add_action( 'woocommerce_before_pay_action', 'aco_require_oferta_accept' );
+
+function aco_require_oferta_accept( $order = null ) {
+    if ( empty( $_POST['aco_oferta_accept'] ) ) {
+        wc_add_notice( 'Подтвердите, что принимаете публичную оферту.', 'error' );
+        return;
+    }
+    if ( $order instanceof WC_Order ) {
+        $updated = function_exists( 'aco_legal_context' ) ? aco_legal_context()['updated'] : '';
+        $order->update_meta_data( '_aco_oferta_version', $updated );
+        $order->update_meta_data( '_aco_oferta_accepted', current_time( 'mysql' ) );
+        $order->save();
+    }
+}
+
 add_action( 'woocommerce_checkout_create_order', function( $order ) {
     if ( ! $order->get_billing_country() ) {
         $order->set_billing_country( 'RU' );
     }
+    $updated = function_exists( 'aco_legal_context' ) ? aco_legal_context()['updated'] : '';
+    $order->update_meta_data( '_aco_oferta_version', $updated );
+    $order->update_meta_data( '_aco_oferta_accepted', current_time( 'mysql' ) );
+} );
+
+add_action( 'woocommerce_before_checkout_billing_form', function() {
+    if ( ! is_user_logged_in() || ! function_exists( 'aco_user_real_email' ) ) {
+        return;
+    }
+    $user = wp_get_current_user();
+    if ( aco_user_real_email( $user ) !== '' ) {
+        return;
+    }
+    echo '<p class="aco-checkout-card__lead">Аккаунт создан по телефону. Укажите почту: на неё уйдут чек и доступ, после этого откроется Moodle.</p>';
 } );
 
 /* ── Auth AJAX: Login ───────────────────────────────────────────────── */
@@ -936,17 +1013,17 @@ add_action( 'wp_ajax_aco_ajax_login',        'aco_ajax_login' );
 function aco_ajax_login() {
     check_ajax_referer( 'aco_login', 'aco_login_nonce' );
 
-    $email    = sanitize_email( $_POST['email'] ?? '' );
+    $login    = trim( (string) wp_unslash( $_POST['login'] ?? $_POST['email'] ?? '' ) );
     $password = $_POST['password'] ?? '';
     $remember = ! empty( $_POST['rememberme'] );
 
-    if ( ! $email || ! $password ) {
-        wp_send_json_error( 'Заполните email и пароль' );
+    if ( ! $login || ! $password ) {
+        wp_send_json_error( 'Заполните почту или телефон и пароль' );
     }
 
-    $user = get_user_by( 'email', $email );
+    $user = function_exists( 'aco_user_by_login' ) ? aco_user_by_login( $login ) : get_user_by( 'email', sanitize_email( $login ) );
     if ( ! $user ) {
-        wp_send_json_error( 'Пользователь с таким email не найден' );
+        wp_send_json_error( 'Аккаунт не найден. Проверьте почту или номер' );
     }
 
     $result = wp_signon( [
@@ -1225,28 +1302,30 @@ function aco_ajax_new_password() {
     check_ajax_referer( 'aco_new_password', 'aco_newpass_nonce' );
 
     $email    = sanitize_email( $_POST['email'] ?? '' );
+    $phone    = function_exists( 'aco_normalize_phone' ) ? aco_normalize_phone( wp_unslash( $_POST['phone'] ?? '' ) ) : '';
     $token    = sanitize_text_field( $_POST['token'] ?? '' );
     $password = $_POST['password'] ?? '';
+    $key      = $phone !== '' ? $phone : $email;
 
-    if ( ! $email || ! $token || ! $password ) {
+    if ( ! $key || ! $token || ! $password ) {
         wp_send_json_error( 'Недостаточно данных' );
     }
     if ( strlen( $password ) < 8 ) {
         wp_send_json_error( 'Пароль должен содержать минимум 8 символов' );
     }
 
-    $stored_token = get_transient( 'aco_reset_token_' . md5( $email ) );
+    $stored_token = get_transient( 'aco_reset_token_' . md5( $key ) );
     if ( false === $stored_token || ! hash_equals( $stored_token, $token ) ) {
         wp_send_json_error( 'Сессия сброса истекла. Начните заново.' );
     }
 
-    $user = get_user_by( 'email', $email );
+    $user = $phone !== '' && function_exists( 'aco_user_by_phone' ) ? aco_user_by_phone( $phone ) : get_user_by( 'email', $email );
     if ( ! $user ) {
         wp_send_json_error( 'Пользователь не найден' );
     }
 
     wp_set_password( $password, $user->ID );
-    delete_transient( 'aco_reset_token_' . md5( $email ) );
+    delete_transient( 'aco_reset_token_' . md5( $key ) );
 
     // Auto-login
     wp_set_current_user( $user->ID, $user->user_login );

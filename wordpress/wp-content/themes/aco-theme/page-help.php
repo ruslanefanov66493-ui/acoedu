@@ -18,7 +18,7 @@ get_header();
                 <span class="lh-breadcrumbs__cur"><?php the_title(); ?></span>
             </nav>
             <h1 class="lh-page-hero__title">Частые вопросы</h1>
-            <p class="lh-page-hero__sub">Отвечаем на самые популярные вопросы об обучении, оплате и сертификатах.</p>
+            <p class="lh-page-hero__sub">Отвечаем на самые популярные вопросы об обучении и оплате.</p>
         </div>
     </section>
 
@@ -32,7 +32,6 @@ get_header();
                 <button class="lh-faq-tab" data-filter="payment" type="button" role="tab" aria-selected="false">Оплата</button>
                 <button class="lh-faq-tab" data-filter="learning" type="button" role="tab" aria-selected="false">Обучение</button>
                 <button class="lh-faq-tab" data-filter="tech" type="button" role="tab" aria-selected="false">Технические вопросы</button>
-                <button class="lh-faq-tab" data-filter="certificates" type="button" role="tab" aria-selected="false">Сертификаты</button>
             </div>
 
             <!-- FAQ list -->
@@ -53,7 +52,7 @@ get_header();
                     [
                         'category' => 'payment',
                         'question' => 'Как получить чек и договор?',
-                        'answer'   => 'Договор — публичная оферта на сайте. Чек направляется на email из заказа после подключения онлайн-кассы / передачи чеков ЮKassa.',
+                        'answer'   => 'Договор — публичная оферта на сайте. Чек на email придёт, когда будет включена передача чеков через ЮKassa или онлайн-кассу. Пока касса не подключена, чек не отправляется.',
                     ],
                     [
                         'category' => 'learning',
@@ -73,7 +72,7 @@ get_header();
                     [
                         'category' => 'tech',
                         'question' => 'Как войти и начать обучение?',
-                        'answer'   => 'После оплаты войдите в личный кабинет по email, который указали при регистрации, и откройте купленный курс. Обучение проходит на платформе Moodle.',
+                        'answer'   => 'Войдите на www.acoedu.ru — почтой или телефоном, как регистрировались. Курс откроется в личном кабинете и дальше в Moodle без отдельного пароля. Если регистрировались по телефону, почту для чека укажите в кабинете или при заказе.',
                     ],
                     [
                         'category' => 'tech',
@@ -86,12 +85,7 @@ get_header();
                         'answer'   => 'Проверьте интернет, отключите блокировщик рекламы или попробуйте другой браузер. Если не поможет — напишите в «Контакты».',
                     ],
                     [
-                        'category' => 'certificates',
-                        'question' => 'Как получить сертификат?',
-                        'answer'   => 'Электронный сертификат выдаётся, если это предусмотрено программой и выполнены условия на странице курса. Он появляется в учебном кабинете.',
-                    ],
-                    [
-                        'category' => 'certificates',
+                        'category' => 'learning',
                         'question' => 'Это государственная лицензия на образование?',
                         'answer'   => 'Сейчас АЦО оказывает информационно-консультационные услуги по обучению. Это не лицензируемая образовательная деятельность, пока у организации нет соответствующей лицензии. Это прямо указано в оферте.',
                     ],

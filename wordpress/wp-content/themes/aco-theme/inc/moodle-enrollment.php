@@ -71,6 +71,9 @@ function aco_moodle_ensure_user( $user_id ) {
     if ( ! $wp_user ) {
         return $result;
     }
+    if ( function_exists( 'aco_user_real_email' ) && aco_user_real_email( $wp_user ) === '' ) {
+        return $result;
+    }
 
     $existing = get_user_meta( $user_id, 'moodle_user_id', true );
     if ( is_numeric( $existing ) && (int) $existing > 0 ) {
@@ -150,6 +153,11 @@ function aco_moodle_enrol_order( $order_id ) {
         }
     }
     if ( empty( $mdl_course_ids ) ) {
+        if ( ! $order->get_meta( '_aco_moodle_link_missing' ) ) {
+            $order->update_meta_data( '_aco_moodle_link_missing', 1 );
+            $order->add_order_note( 'Moodle: у товара в заказе нет привязанного курса, зачисление пропущено.' );
+            $order->save();
+        }
         return;
     }
 
@@ -195,7 +203,7 @@ add_action( 'woocommerce_order_status_processing', 'aco_moodle_enrol_order' );
 add_action( 'woocommerce_order_status_completed', 'aco_moodle_enrol_order' );
 
 /**
- * Access email: Moodle credentials on first purchase, plain access notice later.
+ * Access email points to the site cabinet. Moodle password is not included.
  */
 function aco_moodle_send_access_email( $user_id, $account, $mdl_course_ids ) {
     $wp_user = get_user_by( 'id', $user_id );
@@ -203,36 +211,21 @@ function aco_moodle_send_access_email( $user_id, $account, $mdl_course_ids ) {
         return;
     }
 
-    $moodle_url  = function_exists( 'aco_moodle_url' ) ? aco_moodle_url() : '';
-    if ( $moodle_url === '' ) {
-        $moodle_url = home_url( '/' );
-    }
     $course_list = '';
     foreach ( $mdl_course_ids as $mdl_id ) {
         $wp_course_id = \app\wisdmlabs\edwiserBridge\wdm_eb_get_wp_course_id_from_moodle_course_id( $mdl_id );
         $title        = $wp_course_id ? get_the_title( $wp_course_id ) : 'Курс #' . $mdl_id;
-        $course_list  .= '— ' . $title . "\n" . $moodle_url . '/course/view.php?id=' . $mdl_id . "\n";
+        $course_list  .= '— ' . $title . "\n";
     }
 
-    if ( $account['created'] && $account['password'] ) {
-        $subject = 'Ваш доступ к обучению — АЦО';
-        $message = sprintf(
-            "Здравствуйте, %s!\n\nОплата прошла успешно. Для вас создан аккаунт в учебной платформе АЦО (Moodle).\n\nЛогин: %s\nПароль: %s\nВход: %s/login/\n\nВаши курсы:\n%s\nРекомендуем сменить пароль после первого входа.",
-            $wp_user->first_name ? $wp_user->first_name : $wp_user->display_name,
-            $wp_user->user_login,
-            $account['password'],
-            $moodle_url,
-            $course_list
-        );
-    } else {
-        $subject = 'Вам открыт доступ к курсу — АЦО';
-        $message = sprintf(
-            "Здравствуйте, %s!\n\nОплата прошла успешно. Вам открыт доступ к курсу в учебной платформе АЦО.\n\nВаши курсы:\n%s\nВход в платформу: %s/login/ (используйте свои данные Moodle).",
-            $wp_user->first_name ? $wp_user->first_name : $wp_user->display_name,
-            $course_list,
-            $moodle_url
-        );
-    }
+    $cabinet = home_url( '/account/' );
+    $subject = 'Вам открыт доступ к курсу — АЦО';
+    $message = sprintf(
+        "Здравствуйте, %s!\n\nОплата прошла успешно. Курс открыт в личном кабинете. Оттуда вы попадёте в уроки без отдельного пароля Moodle.\n\nКабинет: %s\n\nКурсы:\n%s",
+        $wp_user->first_name ? $wp_user->first_name : $wp_user->display_name,
+        $cabinet,
+        $course_list
+    );
 
     wp_mail( $wp_user->user_email, $subject, $message );
 }
@@ -281,3 +274,4 @@ function aco_moodle_unenrol_order( $order_id ) {
 }
 
 add_action( 'woocommerce_order_status_refunded', 'aco_moodle_unenrol_order' );
+add_action( 'woocommerce_order_status_cancelled', 'aco_moodle_unenrol_order' );

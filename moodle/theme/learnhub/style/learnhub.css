@@ -250,15 +250,17 @@ body.pagelayout-login .btn-footer-popover {
     margin: 12px 16px 0;
     display: flex !important;
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 10px;
+    max-width: calc(100% - 32px);
+    box-sizing: border-box;
   }
 
   .lh-side__item {
-    flex: 1 1 0;
+    flex: 1 0 auto;
     margin-bottom: 0 !important;
-    padding: 10px 8px;
+    padding: 10px 12px;
     font-size: .8125rem;
     white-space: nowrap;
   }
@@ -271,9 +273,27 @@ body.pagelayout-login .btn-footer-popover {
 @media (max-width: 480px) {
   .lh-mdash__sidebar { grid-template-columns: 1fr; }
   .lh-md-topbar__logo img { width: 132px; height: 46px; }
+  .lh-side__item { flex: 1 1 calc(50% - 8px); }
+  .lh-teach,
+  .lh-teach__form,
+  .lh-stu,
+  .lh-meet__card,
+  .lh-hw__review,
+  .lh-chatbox {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .lh-teach__form input,
+  .lh-teach__form select,
+  .lh-teach__form textarea,
+  .lh-teach__input {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
 
-.lh-account-page, .lh-teach { max-width: 920px; margin: 24px auto 48px; padding: 0 8px 24px; }
+.lh-teach__form select.custom-select { height: auto; min-height: 46px; line-height: 1.5; font-size: 1rem; font-weight: 500; padding: 10px 2.5rem 10px 12px; background-color: #fff; }
+.lh-account-page, .lh-teach { max-width: min(920px, 100%); margin: 24px auto 48px; padding: 0 8px 24px; overflow-x: clip; }
 .lh-account-page__form, .lh-teach__card { background: #fff; border: 1px solid #ECEEF2; border-radius: 16px; padding: 20px; display: grid; gap: 14px; }
 .lh-account-page__form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
 .lh-account-page__form input, .lh-account-page__form textarea { border: 1px solid #E5E7EB; border-radius: 10px; padding: 10px 12px; font: inherit; }
@@ -302,7 +322,7 @@ body.lh-teacher:not(.pagelayout-login) #page.drawers .main-inner {
   box-shadow: none !important;
   border: 0 !important;
 }
-.lh-teach__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 8px; }
+.lh-teach__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 8px; }
 .lh-teach__stat { background: #fff; border: 1px solid #ECEEF2; border-radius: 16px; padding: 16px 18px; }
 .lh-teach__stat strong { display: block; font-size: 1.5rem; color: #111827; }
 .lh-teach__stat span { color: #6B7280; font-size: .85rem; }
@@ -320,6 +340,6 @@ body.lh-teacher:not(.pagelayout-login) #page.drawers .main-inner {
   body.lh-teacher:not(.pagelayout-login) #page-wrapper { padding-left: 0 !important; }
 }
 @media (max-width: 900px) {
-  .lh-teach__stats { grid-template-columns: 1fr; }
+  .lh-teach__stats { grid-template-columns: 1fr 1fr; }
   .lh-build__nav { display: flex !important; flex-basis: 100%; }
 }

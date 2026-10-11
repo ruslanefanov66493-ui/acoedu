@@ -65,7 +65,6 @@ function theme_learnhub_builder_ensure_aco($course) {
         'hiddensections' => 0,
         'coursedisplay' => COURSE_DISPLAY_SINGLEPAGE,
         'aco_sequential' => 1,
-        'aco_certificate' => 1,
     ]);
     return get_course($course->id);
 }
@@ -279,10 +278,13 @@ function theme_learnhub_builder_section_role($section) {
 
 /**
  * @param \cm_info $cm
- * @return string video|page|summary|practice|test|finaltest|final|file|link
+ * @return string video|page|summary|practice|test|finaltest|final|file|link|meeting
  */
 function theme_learnhub_builder_item_kind($cm) {
     $id = strtolower(trim((string) $cm->idnumber));
+    if ($cm->modname === 'bigbluebuttonbn' || $id === 'meeting' || strpos($id, 'meeting') === 0) {
+        return 'meeting';
+    }
     if (strpos($id, 'video') === 0) {
         return 'video';
     }
@@ -337,6 +339,7 @@ function theme_learnhub_builder_kind_label($kind) {
         'final' => 'Финальная работа',
         'file' => 'Файл',
         'link' => 'Ссылка',
+        'meeting' => 'Онлайн-встреча',
     ];
     return $map[$kind] ?? 'Материал';
 }
@@ -500,6 +503,84 @@ function theme_learnhub_builder_modinfo_base($course, $sectionnum, $modname, $na
  * @param bool $manual
  * @return \stdClass
  */
+/**
+ * Live class in the programme. Uses Moodle's built-in BigBlueButton activity.
+ * Join URLs stay inside Moodle: no shareable guest link, wait for teacher.
+ *
+ * @param \stdClass $course
+ * @param int $sectionnum
+ * @param string $name
+ * @param string $intro
+ * @param int $openingtime
+ * @param int $closingtime
+ * @return \stdClass
+ */
+function theme_learnhub_builder_add_meeting($course, $sectionnum, $name, $intro, $openingtime, $closingtime) {
+    global $DB;
+
+    if (!$DB->get_field('modules', 'id', ['name' => 'bigbluebuttonbn', 'visible' => 1])) {
+        throw new moodle_exception('moduledisable', 'error', '', 'bigbluebuttonbn');
+    }
+
+    $info = theme_learnhub_builder_modinfo_base($course, $sectionnum, 'bigbluebuttonbn', $name, 'meeting');
+    $info->instance = 0;
+    $info->intro = $intro !== '' ? $intro : '<p>Вход только из аккаунта ученика этого курса. Ссылку переслать нельзя.</p>';
+    $info->type = 0;
+    $info->wait = 1;
+    $info->record = 1;
+    $info->recordallfromstart = 0;
+    $info->recordhidebutton = 0;
+    $info->welcome = '';
+    $info->voicebridge = 0;
+    $info->openingtime = max(0, (int) $openingtime);
+    $info->closingtime = max(0, (int) $closingtime);
+    $info->presentation = '';
+    $info->participants = '[]';
+    $info->userlimit = 0;
+    $info->recordings_html = 0;
+    $info->recordings_deleted = 1;
+    $info->recordings_imported = 0;
+    $info->recordings_preview = 0;
+    $info->muteonstart = 1;
+    $info->guestallowed = 0;
+    $info->mustapproveuser = 1;
+    $info->showpresentation = 1;
+    $info->groupmode = SEPARATEGROUPS;
+    $info->completion = COMPLETION_TRACKING_AUTOMATIC;
+    $info->completionview = COMPLETION_VIEW_REQUIRED;
+    $cm = add_moduleinfo($info, $course);
+    format_aco_rebuild_sequence($course->id);
+    return $cm;
+}
+
+/**
+ * @param \stdClass $course
+ * @param \cm_info $cm
+ * @param string $name
+ * @param string $intro
+ * @param int $openingtime
+ * @param int $closingtime
+ */
+function theme_learnhub_builder_update_meeting($course, $cm, $name, $intro, $openingtime, $closingtime) {
+    global $DB;
+
+    $DB->update_record('bigbluebuttonbn', (object) [
+        'id' => $cm->instance,
+        'name' => $name,
+        'intro' => $intro,
+        'introformat' => FORMAT_HTML,
+        'wait' => 1,
+        'guestallowed' => 0,
+        'openingtime' => max(0, (int) $openingtime),
+        'closingtime' => max(0, (int) $closingtime),
+        'timemodified' => time(),
+    ]);
+    set_coursemodule_name($cm->id, $name);
+    set_coursemodule_idnumber($cm->id, 'meeting');
+    $DB->set_field('course_modules', 'groupmode', SEPARATEGROUPS, ['id' => $cm->id]);
+    rebuild_course_cache($course->id, true);
+}
+
 function theme_learnhub_builder_add_page($course, $sectionnum, $name, $content, $idnumber, $manual = true) {
     $info = theme_learnhub_builder_modinfo_base($course, $sectionnum, 'page', $name, $idnumber);
     $info->content = $content;

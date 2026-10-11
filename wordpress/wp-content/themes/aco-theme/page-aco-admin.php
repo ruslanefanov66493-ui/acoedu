@@ -67,6 +67,28 @@ get_header();
 			</div>
 		</header>
 
+		<?php if ( function_exists( 'aco_sms_is_stub' ) && aco_sms_is_stub() ) : ?>
+		<section class="lh-studio-sms">
+			<h2>SMS-коды (тестовый режим)</h2>
+			<p class="lh-studio__lead">Провайдер не подключён. Коды не уходят на телефон и видны только здесь.</p>
+			<?php $aco_sms_log = aco_sms_stub_log(); ?>
+			<?php if ( ! $aco_sms_log ) : ?>
+				<p>Пока пусто.</p>
+			<?php else : ?>
+				<ul class="lh-studio-sms__list">
+					<?php foreach ( $aco_sms_log as $row ) : ?>
+					<li>
+						<strong><?php echo esc_html( $row['phone'] ?? '' ); ?></strong>
+						<span><?php echo esc_html( $row['code'] ?? '' ); ?></span>
+						<span><?php echo esc_html( $row['purpose'] ?? '' ); ?></span>
+						<time><?php echo esc_html( wp_date( 'd.m H:i', (int) ( $row['at'] ?? 0 ) ) ); ?></time>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</section>
+		<?php endif; ?>
+
 		<nav class="lh-studio__tabs" aria-label="Разделы панели">
 			<a class="lh-studio__tab<?php echo $view === 'courses' ? ' is-active' : ''; ?>" href="<?php echo esc_url( aco_admin_home_url() ); ?>">Курсы</a>
 			<a class="lh-studio__tab<?php echo $view === 'directions' ? ' is-active' : ''; ?>" href="<?php echo esc_url( aco_admin_directions_url() ); ?>">Направления</a>

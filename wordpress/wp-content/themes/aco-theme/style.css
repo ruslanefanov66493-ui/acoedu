@@ -3,7 +3,7 @@ Theme Name: ACO LearnHub
 Theme URI: https://learnhub.local
 Author: ACO Team
 Description: LearnHub — pixel-perfect верстка по Figma node 1:2 (🏠 WordPress — Public)
-Version: 2.1.18
+Version: 2.1.19
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 8.0
@@ -855,15 +855,13 @@ body.lh-glass.home {
   align-self: stretch;
 }
 
-/* h2 (17:571): Inter Bold 36px, LEFT align, #000000
-   Note: text is left-aligned inside the centered flex container */
 .lh-section-title {
   font-size: var(--fs-h2);             /* 36px */
   font-weight: var(--fw-bold);
   line-height: 1.3;
   color: var(--c-black);
   text-align: left;
-  align-self: flex-start;              /* keeps left-align inside center container */
+  align-self: flex-start;
 }
 
 /* h4 subtitle: Inter Semi-Bold 24px, secondary-text-600 */
@@ -874,6 +872,18 @@ body.lh-glass.home {
   color: var(--c-muted2);
   text-align: left;
   align-self: flex-start;
+}
+
+.lh-directions .lh-section-head {
+  align-items: center;
+  text-align: center;
+}
+
+.lh-directions .lh-section-title,
+.lh-directions .lh-section-sub {
+  text-align: center;
+  align-self: center;
+  width: 100%;
 }
 
 /* Directions: cards from /aco-admin/ categories, centered as a group */
@@ -2247,6 +2257,111 @@ body.lh-glass.home {
   color: var(--c-ph);
 }
 
+.lh-req-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 28px;
+  align-items: stretch;
+}
+
+.lh-req-card {
+  background: var(--c-white);
+  border: 1px solid var(--c-border);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, .06);
+  padding: 24px 22px;
+}
+
+.lh-req-card__title {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+  line-height: 1.3;
+  color: var(--c-black);
+}
+
+.lh-req-card__role {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--c-ph);
+}
+
+.lh-req-card__name {
+  margin: 4px 0 14px;
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+  color: var(--c-black);
+}
+
+.lh-req-card__phone {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+  color: var(--c-black);
+  text-decoration: none;
+}
+
+.lh-req-card__phone:hover {
+  color: var(--c-primary-700);
+}
+
+.lh-req-card__list {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 14px;
+}
+
+.lh-req-card__list div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lh-req-card__list dt {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-ph);
+}
+
+.lh-req-card__list dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+  color: var(--c-black);
+}
+
+.lh-req-card__list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lh-req-card__list a:hover {
+  color: var(--c-primary-700);
+}
+
+.lh-req-card__note,
+.lh-req-card__bank {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--c-text);
+}
+
+.lh-req-card__note a {
+  color: var(--c-primary-700);
+}
+
+@media (max-width: 900px) {
+  .lh-req-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 .lh-hero__stats .lh-stat__num {
   font-size: 22px;
   line-height: 1.2;
@@ -3295,6 +3410,33 @@ body.lh-glass.home {
   margin: 20px 0 0;
 }
 
+.aco-channel {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #f3f4f6;
+}
+
+.aco-channel__btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: inherit;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.aco-channel__btn.is-active {
+  background: #fff;
+  color: #4338ca;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, .08);
+}
+
 .aco-auth-panel {
   display: none;
 }
@@ -3344,7 +3486,8 @@ body.lh-glass.home {
 
 .aco-field input[type="text"],
 .aco-field input[type="email"],
-.aco-field input[type="password"] {
+.aco-field input[type="password"],
+.aco-field input[type="tel"] {
   width: 100%;
   min-height: 48px;
   height: 48px;
@@ -3362,7 +3505,8 @@ body.lh-glass.home {
 
 .aco-field input[type="text"]:focus,
 .aco-field input[type="email"]:focus,
-.aco-field input[type="password"]:focus {
+.aco-field input[type="password"]:focus,
+.aco-field input[type="tel"]:focus {
   border-color: var(--c-primary-600);
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16);
 }
@@ -4419,6 +4563,224 @@ body.logged-in .lh-catalog-page .lh-catalog-main {
   padding: 12px 22px;
 }
 
+.lh-dash__tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.lh-dash__tab {
+  border: 0;
+  background: #EEF2FF;
+  color: #4F46E5;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lh-dash__tab.is-active {
+  background: #3011dd;
+  color: #fff;
+}
+
+.lh-dash__pane {
+  display: none;
+}
+
+.lh-dash__pane.is-active {
+  display: block;
+}
+
+.lh-profile-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.lh-profile-card--contacts {
+  height: 100%;
+}
+
+.lh-profile-col {
+  display: grid;
+  gap: 28px;
+}
+
+.lh-profile-card {
+  background: #fff;
+  border: 1px solid #ECEEF2;
+  border-radius: 20px;
+  padding: 28px;
+}
+
+.lh-profile-card .lh-dash__section-title {
+  margin-bottom: 8px;
+}
+
+.lh-profile-lead,
+.lh-profile-hint {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+.lh-profile-hint {
+  margin: -4px 0 14px;
+  font-size: 13px;
+}
+
+.lh-profile-card [hidden] {
+  display: none !important;
+}
+
+.lh-profile-form label {
+  display: block;
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.lh-profile-form input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin-top: 6px;
+  box-sizing: border-box;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  color: #111827;
+  background: #fff;
+}
+
+.lh-profile-form input:focus {
+  outline: none;
+  border-color: #3011dd;
+  box-shadow: 0 0 0 3px rgba(48, 17, 221, .12);
+}
+
+.lh-profile-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.lh-profile-submit {
+  min-height: 48px;
+  padding: 12px 22px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.lh-profile-block + .lh-profile-block {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid #ECEEF2;
+}
+
+.lh-profile-fact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #F8FAFC;
+}
+
+.lh-profile-kicker {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #9CA3AF;
+}
+
+.lh-profile-value {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  word-break: break-all;
+}
+
+.lh-profile-badge {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ECFDF5;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lh-profile-textbtn {
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #4F46E5;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lh-profile-textbtn:hover {
+  color: #3011dd;
+}
+
+.lh-profile-note {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.lh-profile-note.is-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 1100px) {
+  .lh-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .lh-profile-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .lh-profile-row,
+  .lh-profile-fact {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .lh-profile-badge {
+    justify-self: start;
+  }
+}
+
 .lh-dash__moodle-note {
   margin-top: 14px;
   color: #6B7280;
@@ -5388,6 +5750,10 @@ form.checkout.aco-checkout {
   float: none;
 }
 
+.aco-checkout-accept {
+  margin: 0 0 14px;
+}
+
 .woocommerce-terms-and-conditions-wrapper,
 .woocommerce-privacy-policy-text {
   display: none;
@@ -6185,10 +6551,31 @@ body:not(.page-template-page-account) .lh-nav-toggle {
   }
 }
 
-.lh-legal table {
-  display: block;
+.lh-legal-table {
   width: 100%;
   overflow-x: auto;
+  margin: 0 0 16px;
+}
+
+.lh-legal-table table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.lh-legal-table th,
+.lh-legal-table td {
+  border: 1px solid #E5E7EB;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lh-legal-table th {
+  background: #F9FAFB;
+  font-weight: 600;
 }
 
 .lh-legal img,

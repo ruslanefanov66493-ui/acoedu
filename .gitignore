@@ -1,17 +1,36 @@
+*.log
 .DS_Store
 .idea/
 .vscode/
-*.log
 .env
 .env.*
 !.env.example
 
+# WordPress / Moodle secrets
 wordpress/wp-config.php
 moodle/config.php
+
+# TLS material, backups, Moodle data
 certs/
 backups/
 moodledata/
+
+# Obsidian local settings
+Obsidian/.obsidian/workspace.json
+Obsidian/.obsidian/graph.json
+
+# Local caches / uploads
 wordpress/wp-content/cache/
 wordpress/wp-content/uploads/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
 **/node_modules/
+
+# Local meeting server: upstream compose, generated config, secrets
+meet/jitsi/
+meet/config/
+
+# OS / editor
 Thumbs.db

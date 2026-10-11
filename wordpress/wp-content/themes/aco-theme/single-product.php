@@ -47,7 +47,7 @@ get_header();
                 <?php endif; ?>
 
                 <ul class="lh-course-hero__facts">
-                    <li><strong><?php echo esc_html( $duration ?: 'Гибкий срок' ); ?></strong><span>длительность</span></li>
+                    <li><strong><?php echo esc_html( $duration ?: 'Срок в описании' ); ?></strong><span>длительность</span></li>
                     <li><strong><?php echo esc_html( $level ?: 'Все уровни' ); ?></strong><span>уровень</span></li>
                     <li><strong><?php echo esc_html( $teacher ?: 'Команда АЦО' ); ?></strong><span>куратор</span></li>
                 </ul>
@@ -84,6 +84,7 @@ get_header();
             <h2 class="lh-course-section__title">Как получить курс после оплаты</h2>
             <div class="lh-course-section__content">
                 <p>Это цифровая услуга: почтой, курьером и самовывозом курс не отправляется. После подтверждения платежа ЮKassa доступ открывается в <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>">личном кабинете</a> и в учебной платформе Moodle. Подробности — на странице <a href="<?php echo esc_url( home_url( '/how/' ) ); ?>">«Как получить курс»</a>.</p>
+                <p>Это не образовательная программа с лицензией: документ об образовании не выдаётся, трудоустройство и уровень дохода не гарантируются.</p>
             </div>
         </div>
     </section>

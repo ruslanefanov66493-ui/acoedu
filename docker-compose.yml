@@ -150,7 +150,7 @@ services:
       MOODLE_COOKIE_DOMAIN: .localtest.me
       MOODLE_SESSION_COOKIE_PATH: /
       MOODLE_USERNAME: admin
-      MOODLE_PASSWORD: ${MOODLE_PASSWORD:-changeme}
+      MOODLE_PASSWORD: Admin123!
       MOODLE_SITE_NAME: "АЦО Moodle"
     extra_hosts:
       - "host.docker.internal:host-gateway"

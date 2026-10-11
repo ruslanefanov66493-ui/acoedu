@@ -102,6 +102,9 @@ echo $OUTPUT->doctype();
         </div>
     </div>
 </div>
-<?php echo $OUTPUT->standard_end_of_body_html(); ?>
+<?php
+echo $OUTPUT->learnhub_legal_nav();
+echo $OUTPUT->standard_end_of_body_html();
+?>
 </body>
 </html>
